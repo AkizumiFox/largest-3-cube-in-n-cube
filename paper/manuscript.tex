@@ -1,0 +1,2279 @@
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,microtype}
+\usepackage[a4paper,margin=29mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools,booktabs,longtable,array}
+\usepackage{aliascnt}
+\usepackage{graphicx,float,needspace}
+\usepackage{titling}
+\setlength{\droptitle}{-11mm}
+\usepackage[dvipsnames]{xcolor}
+\definecolor{ManuscriptLinkBlue}{HTML}{0000FF}
+\usepackage[colorlinks=true,linkcolor=ManuscriptLinkBlue,citecolor=ManuscriptLinkBlue,urlcolor=ManuscriptLinkBlue]{hyperref}
+\usepackage[nameinlink,noabbrev]{cleveref}
+\hypersetup{
+  pdftitle={Largest Three-dimensional Cubes in Higher-dimensional Unit Cubes},
+  pdfauthor={K.-C. Chang},
+  pdfsubject={Preliminary working draft, 25 November 2026}
+}
+\numberwithin{equation}{section}
+\newtheorem{theorem}{Theorem}[section]
+\newaliascnt{proposition}{theorem}
+\newtheorem{proposition}[proposition]{Proposition}
+\aliascntresetthe{proposition}
+\newaliascnt{lemma}{theorem}
+\newtheorem{lemma}[lemma]{Lemma}
+\aliascntresetthe{lemma}
+\newaliascnt{corollary}{theorem}
+\newtheorem{corollary}[corollary]{Corollary}
+\aliascntresetthe{corollary}
+\theoremstyle{definition}
+\newaliascnt{definition}{theorem}
+\newtheorem{definition}[definition]{Definition}
+\aliascntresetthe{definition}
+\theoremstyle{definition}
+\newaliascnt{remark}{theorem}
+\newtheorem{remark}[remark]{Remark}
+\aliascntresetthe{remark}
+\crefname{theorem}{Theorem}{Theorems}
+\crefname{proposition}{Proposition}{Propositions}
+\crefname{lemma}{Lemma}{Lemmas}
+\crefname{corollary}{Corollary}{Corollaries}
+\crefname{definition}{Definition}{Definitions}
+\crefname{remark}{Remark}{Remarks}
+\newcommand{\R}{\mathbb R}
+\newcommand{\N}{\mathbb N}
+\newcommand{\F}{F_3}
+\newcommand{\abs}[1]{\lvert#1\rvert}
+\newcommand{\norm}[1]{\lVert#1\rVert}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\supp}{supp}
+\newcommand{\ds}{\delta_*}
+\newcommand{\Dlt}{\Delta}
+\title{Largest three-dimensional cubes\\in higher-dimensional unit cubes}
+\author{\normalsize\begin{minipage}{0.87\textwidth}\centering
+  {\large K.-C. Chang}\\[5pt]
+  \emph{Preliminary working draft. This manuscript has not yet undergone final editorial revision.}\\[4pt]
+  Questions, comments, and corrections are welcome at\\[2pt]
+  \href{mailto:mathdog81321@gmail.com}{\texttt{mathdog81321@gmail.com}}.
+\end{minipage}}
+\date{\normalsize 25 November 2026}
+\begin{document}
+\maketitle
+\begin{abstract}
+We determine the maximal side length $f(3,n)$ of a three-dimensional
+cube contained in the unit $n$-cube for every $n\ge3$. The values in
+dimensions $4$ and $5$, and those for $3\mid n$, were previously known.
+We obtain exact values in the remaining cases, including the exceptional
+dimension $n=7$, and prove the recurrence
+$f(3,n+3)^2=f(3,n)^2+1$ for every $n\ge8$.
+
+The containment problem is equivalent to optimizing real matrices with
+$A^{\mathsf T}A=sI_3$ and $\|a_i\|_1\le1$ for every row $a_i$.
+The sharp upper bounds use multiplier equations, second-order variations,
+and estimates for rows supported on two coordinates. We also establish,
+for every fixed inner dimension $k\ge2$, an equivalence between eventual
+stabilization of the squared optimum and the existence of maximizing
+matrices with uniformly bounded numbers of rows other than signed
+coordinate vectors. A sign-matrix correspondence gives exact values for
+regular tetrahedra whose centroid is the origin. A Lean~4 formalization
+of the main results accompanies the manuscript.
+\end{abstract}
+\medskip
+{\setcounter{tocdepth}{1}\small\tableofcontents}
+\newpage
+
+\section{The problem and the formula}
+\label{sec:main}
+Let $C_d=[-1/2,1/2]^d$.  For $n\ge k$, let $f(k,n)$ be the largest
+side length of a $k$-cube contained isometrically in $C_n$.  The embedded cube
+may be rotated and translated.  We ask for containment, not for a
+cube passing through a hole in another one.  The latter is related to
+Rupert's problem (see \cite{HSW2018,SteiningerYurkevich2023}).
+
+We write $F_k(n)=f(k,n)^2$ and set
+\[
+ \ds=15-4\sqrt{14},\qquad \Dlt=10-4\sqrt6.
+\]
+The two exceptional algebraic constants $\delta_1$ and $\delta_2$
+are specified uniquely in \cref{sec:algebraic-parameters}.  Their
+approximate values are $\delta_1\approx0.014925$ and
+$\delta_2\approx0.030276$.  The explicit defining equations are
+introduced together with the exceptional constructions they describe.
+
+\begin{theorem}[Exact formula]\label{thm:sharp-values}
+For every integer $n\ge3$,
+\begin{equation}\label{eq:main-formula}
+ \F(n)=
+ \begin{cases}
+ m,& n=3m,\ m\ge1,\\
+ 1+\delta_1,&n=4,\\
+ 2+\delta_2,&n=7,\\
+ m+\ds,&n=3m+1,\ m\ge3,\\
+ m+\Dlt,&n=3m+2,\ m\ge1.
+ \end{cases}
+\end{equation}
+In particular, $f(3,n)=\sqrt{\F(n)}$.
+\end{theorem}
+
+The case $3\mid n$ follows from a trace bound. The other two
+residue classes require separate sharp upper bounds.  We give the constructions
+in \cref{sec:matrix} and prove optimality in
+\cref{sec:residue-one,sec:residue-two}.
+
+\begin{corollary}[Eventual recurrence]\label{cor:eventual-recurrence}
+For every integer $n\ge8$,
+\begin{equation}\label{eq:recurrence}
+ f(3,n+3)^2=f(3,n)^2+1.
+\end{equation}
+More precisely, for $n\ge3$ the equality holds if and only if
+$n\notin\{4,7\}$.
+\end{corollary}
+\begin{proof}
+Except at $n=4,7$, the formulas in \cref{thm:sharp-values}
+use the same expression for $\F(n)$ and $\F(n+3)$, with the integer
+parameter $m$ increased by one. Their difference is therefore $1$.
+It remains to check the transitions from dimension $4$ to $7$
+and from $7$ to $10$. For these two transitions, we need to know
+which of the exceptional corrections $\delta_1,\delta_2$ is larger,
+and how both compare with the stable correction $\ds$.
+The root-isolation estimates proved later in \cref{lem:root-isolation}
+give the strict ordering
+\[
+ \delta_1<(17/100)^2<(347/2000)^2<\delta_2
+ <49/1600<\ds.
+\]
+The final inequality follows from
+$\sqrt{14}<23951/6400$, which holds because both sides are positive
+and $23951^2-14\cdot6400^2=210401>0$.
+Using the formula for the three relevant dimensions gives
+\[
+ \F(7)-\F(4)=1+\delta_2-\delta_1>1,\qquad
+ \F(10)-\F(7)=1+\ds-\delta_2>1.
+\]
+These are the only two failures of the recurrence.
+\end{proof}
+
+\subsection{Earlier work}
+Gardner~\cite{Gardner1966} asked for $f(3,4)$.  The general problem
+$f(k,n)$ appears in \cite[Problem~B4]{CFG1991}.  Shultz
+\cite{Shultz2013} obtained the divisible-dimensional values, the cases
+$k=2$, and $f(3,4)$.  Finch~\cite[Sec.~8.14]{Finch2003} records the
+five-dimensional value attributed to Huber:
+\[
+ f(3,5)=\sqrt{11-4\sqrt6}=2\sqrt2-\sqrt3.
+\]
+An explicit construction appears in \cite{Firsching2014}.
+Thus $f(3,4)$ and $f(3,5)$ were known before this work.
+Huber and Ligocki's related study of scaling in generalized Rupert
+problems is listed as unpublished in \cite{HSW2018}.
+No result from that manuscript is used here.
+The distinction between this cube problem and related results on
+simplices is discussed in \cref{sec:consequences}.
+
+\subsection{Proof outline}
+Let $A\in\mathbb R^{n\times3}$ be an optimal matrix at level
+$s=F_3(n)$.  The main constraints are
+\[
+ A^{\mathsf T}A=sI_3,\qquad \|a_i\|_1\le1.
+\]
+The trace bound gives $s\le n/3$, with equality when $3\mid n$.
+For the remaining dimensions, a key step is to prove that every row
+of a maximizing matrix satisfies $\|a_i\|_1=1$. In particular, the
+case $n\equiv2\pmod3$ requires a separate argument to exclude rows
+with zero multiplier weight. We then use multipliers and second-order
+variations to bound the possible supports. A row with three nonzero
+coordinates is called \emph{full}, and a row with exactly two is called
+a \emph{pair row}. If $F$ and $Q$ count these rows respectively and a
+full row occurs, then
+\[
+ Q+2F\le5.
+\]
+The structural classification of full-row cases appears in
+\cref{sec:variation} and is shared by the two residue classes.
+When there are no full rows, each remaining non-pure row uses exactly
+two coordinates. The multiplier equations orient the occurring
+coordinate pairs into a directed acyclic graph. Quantitative bounds
+on the squared entries of these pair rows then give the stable upper
+bounds. Dimensions $4$ and $7$ require separate algebraic cases.
+Explicit constructions in \cref{sec:matrix,prop:exceptional-frames}
+provide the matching lower bounds.
+
+% BEGIN sections/model
+\section{Matrix formulation and bounds}
+\label{sec:matrix}
+\begin{definition}
+An $n\times k$ real matrix $A$ is feasible at level $s$ if
+\[
+ A^{\mathsf T}A=sI_k,\qquad \norm{a_i}_1\le1\quad(1\le i\le n),
+\]
+where $a_i$ denotes its $i$th row.
+\end{definition}
+
+We call a feasible matrix at positive level a \emph{feasible frame}.
+A \emph{maximizing frame} is feasible at the largest possible level
+$F_k(n)$. The inequality $\|a_i\|_1\le1$ is the \emph{row budget}
+for row $i$. Every row is subject to its own budget.
+Its \emph{support} is the set of columns in which it is nonzero,
+$\supp(a_i)=\{j:a_{ij}\ne0\}$.
+
+The condition $A^{\mathsf T}A=sI_k$ will be called \emph{isotropy at
+level $s$}. It means that the $k$ columns of $A$ are mutually
+orthogonal and each has squared Euclidean norm $s$. In particular,
+for every column $j$,
+\[
+ \sum_{i=1}^{n}a_{ij}^2=s.
+\]
+We refer to any sum of squares of matrix entries as its
+\emph{squared mass}, or \emph{energy}. More precisely, for a set of
+entry positions $\mathcal I\subseteq\{1,\ldots,n\}\times
+\{1,\ldots,k\}$, its squared mass is
+$\sum_{(i,j)\in\mathcal I}a_{ij}^2$. Thus the energy in a whole
+column is exactly $s$, whereas the mass in a subset of that column
+need not equal $s$.
+
+In the three-column case, a \emph{pure row} has support of size one,
+a \emph{pair row} has support of size two, and a \emph{full row}
+has support of size three. A \emph{balanced pair row} has two
+nonzero entries with equal absolute values. A row is
+\emph{saturated} when $\|a_i\|_1=1$ and \emph{slack} when
+$\|a_i\|_1<1$. We call a pair row or a full row a \emph{mixed row}.
+The \emph{mixed contribution} to squared mass in column $j$ is
+\[
+ E_j^{\mathrm{mix}}(A)=
+ \sum_{\substack{1\le i\le n\\|\supp(a_i)|\in\{2,3\}}}a_{ij}^2.
+\]
+For later reference, a saturated pure row is necessarily one of the
+\emph{signed unit coordinate vectors} $\pm e_j$, where $e_j$ denotes
+the $j$th standard basis vector.
+
+\begin{proposition}\label{prop:matrix-model}
+For integers $k\ge1$ and $n\ge k$,
+\[
+ F_k(n)=\max\{s:A\text{ is feasible at level }s\}.
+\]
+The maximum exists, and $F_k(n)\le n/k$. Equality holds precisely when
+$k$ divides $n$.
+\end{proposition}
+\begin{proof}
+An isometric copy of a cube of side $\ell$ has the form
+$c+\ell U C_k$, where $U^{\mathsf T}U=I_k$.  Its projection onto the
+$i$th coordinate is an interval of length $\ell\norm{u_i}_1$.
+Indeed, the maximum of $u_i\cdot x$ over $x\in C_k$ equals
+$\norm{u_i}_1/2$.  Containment in $C_n$ therefore requires
+$\ell\norm{u_i}_1\le1$.  Conversely, these inequalities place the
+centered copy $\ell U C_k$ inside $C_n$.  Hence allowing a translation
+does not improve the optimum.  Taking $A=\ell U$ gives the matrix
+formulation.
+The feasible matrices form a closed subset of the compact product of
+$n$ unit $\ell^1$ balls, and $s=k^{-1}\tr(A^{\mathsf T}A)$ is continuous.
+Furthermore,
+\[
+ ks=\sum_i\norm{a_i}_2^2\le\sum_i\norm{a_i}_1^2\le n.
+\]
+If equality holds, every row has $\ell^1$-norm $1$ and only one nonzero
+entry. Hence every row is some $\pm e_j$. Because the Gram matrix
+has equal diagonal entries, the number of these unit rows must be
+the same in each column. That number is an integer, so $k\mid n$.
+Conversely, taking $n/k$ vertically concatenated copies of $I_k$
+gives equality.
+\end{proof}
+
+For matrices $A\in\R^{n_1\times k}$ and $B\in\R^{n_2\times k}$,
+\emph{stacking} means placing one matrix below the other to form
+$\begin{pmatrix}A\\B\end{pmatrix}\in\R^{(n_1+n_2)\times k}$.
+The Gram matrix of the stacked matrix is the sum
+$A^{\mathsf T}A+B^{\mathsf T}B$. Thus stacking feasible matrices
+at levels $s_1,s_2$ produces a feasible matrix at level $s_1+s_2$.
+
+\begin{proposition}[Stacking]\label{prop:stacking}
+For $n\ge k$,
+\[
+ F_k(n+k)\ge F_k(n)+1.
+\]
+More generally, $F_k(n_1+n_2)\ge F_k(n_1)+F_k(n_2)$ for $n_1,n_2\ge k$.
+\end{proposition}
+\begin{proof}
+The Gram identity above shows that stacking preserves the row budgets
+and adds the two levels. For the first inequality, take $B=I_k$,
+which is feasible at level $1$.
+\end{proof}
+
+\begin{remark}
+Stacking gives only a lower bound.  The equality in
+\cref{cor:eventual-recurrence} needs the sharp upper bound.
+\end{remark}
+
+We shall use three nonnegative quantities associated with a feasible
+matrix. The \emph{row loss} $L_i$ measures how much the squared
+Euclidean norm of row $i$ falls short of $1$. The \emph{pair-product
+mass} $P_i$ sums the absolute products of distinct entries in that
+row. Their total loss is $L$:
+\[
+ L_i=1-\norm{a_i}_2^2,\qquad
+ P_i=\sum_{j<l}\abs{a_{ij}a_{il}},\qquad L=\sum_iL_i=n-ks.
+\]
+Here $j,l$ range over the $k$ columns and $i$ over the $n$ rows.
+Since $\norm{a_i}_1^2=\norm{a_i}_2^2+2P_i\le1$,
+we have $L_i\ge2P_i$.
+For each pair of columns, orthogonality means that its signed products
+sum to zero. The absolute product in one row therefore cannot exceed
+the sum of the corresponding products in the other rows.
+Summing this observation over all column pairs yields
+\begin{equation}\label{eq:cancellation}
+ \sum_{h\ne i}P_h\ge P_i.
+\end{equation}
+
+\begin{lemma}[Dominant coordinates]\label{lem:dominance}
+Let $k\ge2$, $n=km+1$, and let $A$ be feasible at level $m+\delta$,
+where $\delta>0$. Every row has a unique coordinate whose absolute value
+exceeds the sum of the absolute values of its other coordinates.
+If $a$ is that absolute value and $b$ is the sum of the others, then
+\[
+ a-b\ge\sqrt{k\delta},\qquad
+ b\le\frac{1-\sqrt{k\delta}}2.
+\]
+Call a row \emph{dominant in column $j$} if that unique coordinate
+is $j$, and write $d(i)$ for the dominant column of row $i$.
+The squared mass outside the dominant positions is, by definition,
+\[
+ E=\sum_{i=1}^n\ \sum_{\substack{1\le j\le k\\j\ne d(i)}}a_{ij}^2.
+\]
+It satisfies
+\begin{equation}\label{eq:E-bound}
+ (k-1)\delta\le E\le\frac{(1-\sqrt{k\delta})^2}{2}.
+\end{equation}
+There are $m+1$ dominant rows in one column and $m$ in each other column.
+Consequently
+\begin{equation}\label{eq:delta-coarse}
+ \delta\le\frac1{(\sqrt{k}+\sqrt{2(k-1)})^2}.
+\end{equation}
+\end{lemma}
+\begin{proof}
+By \eqref{eq:cancellation},
+$L\ge1-\norm{a_i}_2^2+2P_i$. Since $L=1-k\delta$,
+\[
+ \norm{a_i}_2^2-2P_i\ge k\delta.
+\]
+Let $a$ be a largest coordinate magnitude, and $b$ the sum of the rest.
+If $a\le b$, the fact that every coordinate has magnitude at most $a$
+gives $\norm{a_i}_2^2\le a(a+b)$.  Since
+$\norm{a_i}_1=a+b$ and $(a+b)^2=\norm{a_i}_2^2+2P_i$,
+\[
+ \norm{a_i}_2^2-2P_i
+ =2\norm{a_i}_2^2-(a+b)^2
+ \le(a+b)(a-b)\le0,
+\]
+contradicting the strict lower bound $k\delta>0$.
+Thus $a>b$, and this dominant coordinate is unique.  Moreover,
+\[
+ \norm{a_i}_2^2-2P_i\le(a-b)^2.
+\]
+Combining this with the same lower bound yields
+$a-b\ge\sqrt{k\delta}$.  The inequality $a+b\le1$ then gives
+$b\le(1-\sqrt{k\delta})/2$.
+
+Put $d=\sqrt{k\delta}$. The conditions $a-b\ge d$ and $a+b\le1$
+give $b/a\le(1-d)/(1+d)$. Thus the nondominant squared mass of this row
+is at most $b^2\le[(1-d)/(1+d)]P_i$. Summation yields
+\[
+ E\le\frac{1-d}{1+d}\frac{L}{2}=\frac{(1-d)^2}{2}<\frac12.
+\]
+A column with at most $m-1$ dominant rows would have energy at most
+$m-1+E<m$, which is impossible. Counting the $km+1$ rows gives the
+asserted multiplicities. The $k-1$ columns with $m$ dominant rows each need at least
+$\delta$ of nondominant energy, proving the lower bound in
+\eqref{eq:E-bound}. Taking square roots of that inequality proves
+\eqref{eq:delta-coarse}.
+\end{proof}
+
+\begin{corollary}\label{cor:two-dimensional}
+For every $m\ge1$, $F_2(2m+1)\le m+1/8$.
+For a three-column feasible frame with $n=3m+1$ and level $m+\delta>m$,
+\[
+ \delta\le7-4\sqrt3<\frac{72}{1000}.
+\]
+\end{corollary}
+\begin{proof}
+Apply \cref{lem:dominance} with $k=2$ and $k=3$.
+Levels at most $m$ require no further argument.
+\end{proof}
+
+\subsection{Two explicit cores}
+In this subsection, a \emph{core} is a fixed finite block of rows
+used to construct a family of feasible matrices. It may be feasible
+by itself, as in the five-row example below, or require additional
+unit coordinate rows to make the Gram matrix a scalar multiple of
+the identity. The term describes a construction, not a uniquely
+determined part of an optimal matrix. The \emph{residual core} in
+\cref{prop:finite-core} has a different, precise meaning: it is the
+collection of rows that are not signed unit coordinate vectors.
+The following five-row matrix gives the known value $F_3(5)$
+\cite{Finch2003}.  Another construction appears in \cite{Firsching2014}.
+We use this matrix because it can be stacked with copies of $I_3$:
+
+\begin{equation}\label{eq:five-core}
+ A_5=\begin{pmatrix}
+ 1&0&0\\ b&a&0\\ b&-a&0\\ b&0&a\\ b&0&-a
+ \end{pmatrix},\qquad
+ b=\frac{\sqrt6-2}{2},\quad a=1-b.
+\end{equation}
+As $a,b>0$ and $a+b=1$, every row has $\ell^1$-norm $1$,
+including those containing a negative entry, since
+$\|(b,-a,0)\|_1=b+a$.  Moreover,
+\[
+ A_5^{\mathsf T}A_5
+ =\diag(1+4b^2,2a^2,2a^2)=(1+\Dlt)I_3.
+\]
+Stacking $m-1$ identity blocks gives $\F(3m+2)\ge m+\Dlt$.
+
+For dimensions $n=3m+1$ with $m\ge3$, the formula will have a
+constant correction term. We refer to these dimensions as the
+\emph{stable first-residue range}. Set
+\[
+ \beta=\frac{4-\sqrt{14}}2,\qquad \alpha=1-\beta.
+\]
+Use the four rows
+\begin{equation}\label{eq:star-mixed}
+ (\alpha,\beta,0),\quad(\alpha,-\beta,0),\quad
+ (\alpha,0,\beta),\quad(\alpha,0,-\beta),
+\end{equation}
+together with $m-3$ copies of $e_1$, $m$ copies of $e_2$, and $m$ copies
+of $e_3$. This gives $3m+1$ rows. Each has $\ell^1$-norm $1$, and the
+resulting Gram matrix is
+\[
+ \diag(m-3+4\alpha^2,m+2\beta^2,m+2\beta^2)
+ =(m+\ds)I_3.
+\]
+This is the \emph{four-pair star construction}, using only column
+pairs $\{1,2\}$ and $\{1,3\}$.
+Here $m\ge3$, since the number of copies of $e_1$ is $m-3$.
+The case $n=7$ needs a different construction.
+
+% END sections/model
+% BEGIN sections/variational
+\section{Multipliers and support}
+\label{sec:variation}
+\subsection{Multiplier systems and rank restrictions}
+Fix an optimal feasible matrix $A$ at level $s=\F(n)>0$.
+Consider the set of all $n\times3$ matrices with the same Gram
+matrix as $A$:
+\[
+ \mathcal M_s=\{B\in\R^{n\times3}:B^{\mathsf T}B=sI_3\}.
+\]
+This is a scaled \emph{Stiefel manifold}. We study the function
+$h(B)=\max_i\norm{b_i}_1$, the largest row $\ell^1$-norm.
+It has minimum $1$ at $A$.
+Indeed, $h(A)\le1$, and if any $B\in\mathcal M_s$ had $h(B)<1$,
+then $B/h(B)$ would be feasible at level $s/h(B)^2>s$.
+Differentiating the Gram constraint along a curve through $A$ gives
+\[
+ T_A\mathcal M_s=\{H:A^{\mathsf T}H+H^{\mathsf T}A=0\}.
+\]
+This tangent space has dimension $3n-6$. We use the Frobenius
+inner product $\langle X,Y\rangle=\tr(X^{\mathsf T}Y)$.
+The corresponding normal space is $\{AS:S=S^{\mathsf T}\}$, since
+$A^{\mathsf T}H$ is skew-symmetric for every tangent $H$ and the
+symmetric matrices form a six-dimensional space.
+Finally, write $h$ as the maximum of the finitely many linear forms
+$\ell_{i,\varepsilon}(B)=\varepsilon^{\mathsf T}b_i$,
+$\varepsilon\in\{-1,1\}^3$. Each inequality
+$\ell_{i,\varepsilon}(B)\le1$ is one of the linear \emph{facet
+constraints} expressing the row budget. It is \emph{active at $A$}
+precisely when $\ell_{i,\varepsilon}(A)=1$. We use \emph{active facet}
+to mean an active constraint, not a separate condition on a row.
+
+For $v\in\R^3$, write $\partial\|v\|_1$ for the \emph{subdifferential}
+of the $\ell^1$-norm. In concrete terms, it consists of those
+$g\in[-1,1]^3$ with $g_j=\operatorname{sgn}(v_j)$ whenever $v_j\ne0$.
+At zero coordinates, any value in $[-1,1]$ is allowed.
+
+\begin{lemma}[Normalized multipliers]\label{lem:multipliers}
+There is a nonempty compact set of normalized multiplier systems
+$(\lambda,g,S)$ satisfying
+\begin{gather*}
+ G=AS,\qquad S=S^{\mathsf T},\qquad
+ G_{i,*}=\lambda_i g_i^{\mathsf T},\\
+ \lambda_i\ge0,\qquad \sum_i\lambda_i=1,\qquad
+ g_i\in\partial\norm{a_i}_1,
+ \qquad \lambda_i>0\Longrightarrow\norm{a_i}_1=1.
+\end{gather*}
+The scalars $\lambda_i$ are the \emph{row multiplier weights},
+and $S$ is the \emph{multiplier matrix}. Positive weight implies
+a saturated row, but the converse is not assumed.
+Normalization means $\sum_i\lambda_i=1$. The weights are
+associated with a chosen multiplier system, not fixed attributes
+of the rows of $A$. For each such system,
+\begin{equation}\label{eq:multiplier-bounds}
+ S_{jj}\ge0,\qquad
+ \abs{S_{jk}}\le\min(S_{jj},S_{kk}),\qquad \tr S=1/s.
+\end{equation}
+\end{lemma}
+\begin{proof}
+No tangent vector can make all active forms strictly negative.
+Otherwise a smooth curve in $\mathcal M_s$ with that initial velocity
+would decrease every active form and, by continuity and finiteness, all
+other forms would remain below $1$.  This would contradict the
+minimality of $A$.
+
+We use the following finite-dimensional alternative.  For linear
+functionals $L_1,\ldots,L_N$ on a vector space $T$, either some
+$v\in T$ satisfies $L_a(v)<0$ for every $a$, or there are
+$\mu_a\ge0$ with $\sum_a\mu_a=1$ such that
+$\sum_a\mu_aL_a=0$ on $T$.  These are mutually exclusive and
+exhaustive, as follows by separating the image of
+$v\mapsto(L_1(v),\ldots,L_N(v))$ from the open negative orthant.
+Apply this alternative to the restrictions of the active forms to
+$T_A\mathcal M_s$.  The resulting convex combination of their
+gradients annihilates the tangent space, so it equals $AS$ for a
+symmetric matrix $S$.
+
+Group the facet weights belonging to row $i$ into $\lambda_i$.
+When $\lambda_i>0$, their normalized convex combination gives
+$g_i\in\partial\norm{a_i}_1$.  For a zero weight, choose any
+subgradient of that row.  The conditions on the $\lambda_i$ follow
+because only active facets appear.  The set of systems is compact:
+facet weights lie in a closed subset of a finite simplex, subgradients
+lie in closed subsets of $[-1,1]^3$, and
+$S=s^{-1}A^{\mathsf T}G$ is continuous in these data.
+
+By the explicit description of the subdifferential above,
+$|g_{ij}|\le1$ and $a_{ij}g_{ij}=|a_{ij}|$. It follows that
+\[
+ S_{jj}=s^{-1}\sum_i\lambda_i|a_{ij}|,\qquad
+ |S_{jk}|\le s^{-1}\sum_i\lambda_i|a_{ij}|=S_{jj}.
+\]
+Symmetry gives the other bound. Taking the trace proves the last identity.
+\end{proof}
+
+\begin{lemma}[Exclusion of rank one]\label{lem:rank-one}
+Suppose $n=3m+r$, $r\in\{1,2\}$, and $s=m+\delta$.
+For $r=1$, assume $0<\delta<1/3$. For $r=2$, assume
+$1/5<\delta\le4/9$. Then no normalized multiplier matrix has rank one.
+Every singular multiplier matrix therefore has rank two and is positive
+semidefinite.
+\end{lemma}
+\begin{proof}
+If $S$ has rank one, its positive trace gives $S=\sigma xx^{\mathsf T}$,
+where $\sigma>0$ and $\norm{x}_2=1$. Let $M$ be the set of coordinates
+of maximum absolute value, $q=|M|$, and let $r_+$ count the positive
+row multipliers. A positive-multiplier row must be supported on $M$,
+have $\ell^1$-norm $1$, and have its coordinate signs aligned with $x$
+up to one common sign. Consequently
+\[
+ s=\norm{Ax}_2^2=r_+\norm{x}_\infty^2\le r_+/q.
+\]
+Apply isotropy to the unit vector equal to $\operatorname{sgn}(x_j)/\sqrt q$
+on $M$ and zero elsewhere. The positive rows alone contribute $r_+/q$,
+so $s\ge r_+/q$. Equality follows, and $s=r_+/q$.
+In the first residue class this is incompatible with $0<\delta<1/3$.
+In the second, the only possibility is $q=3$, $\delta=1/3$, and
+$r_+=3m+1$. After changing coordinate signs, all products within the
+positive rows are nonnegative. Only one row remains to cancel them.
+That row cannot have three nonzero entries, since some pair of its
+coordinates has positive product. If the remaining row is supported on two coordinates, every positive
+row involving the third coordinate must be pure, since its product
+with any other coordinate is nonnegative and cannot be canceled.
+That column then has integer squared energy, contrary to $s=m+1/3$.
+If the remaining row has support of size at most one, the same argument
+applies to at least two columns.
+
+All principal minors of order two are nonnegative by
+\eqref{eq:multiplier-bounds}. If $S$ has rank two, let $\mu_1,\mu_2$
+be its nonzero eigenvalues. Then
+\[
+ \mu_1\mu_2=\sum_{j<k}(S_{jj}S_{kk}-S_{jk}^2)\ge0,
+ \qquad \mu_1+\mu_2=\tr S=\frac1s>0.
+\]
+Since neither eigenvalue vanishes, both are positive.
+\end{proof}
+
+\begin{lemma}[Active rows in the first residue class]\label{lem:active-r1}
+If $n=3m+1$ and $\F(n)=m+\delta>m$, every row multiplier in every
+normalized system is positive. In particular, every row has
+$\ell^1$-norm $1$.
+\end{lemma}
+\begin{proof}
+The bound in \cref{cor:two-dimensional} excludes rank one.
+Suppose $\lambda_i=0$ for some row. By \cref{lem:dominance}, this
+row is nonzero, so $S$ is singular. The rank-one exclusion gives
+$\ker S=\R x$. Each zero-weight row is parallel to $x$, which has
+a strictly dominant coordinate $j$:
+\[
+ |x_j|>\sum_{k\ne j}|x_k|.
+\]
+For $\lambda_i>0$, the multiplier equation gives
+$g_i^{\mathsf T}x=0$. If $a_{ij}\ne0$, then $|g_{ij}|=1$, contradicting
+strict dominance. Hence
+\[
+ \lambda_i>0\Longrightarrow a_{ij}=0,\qquad
+ \lambda_i=0\Longrightarrow a_i^{\mathsf T}=t_i x.
+\]
+For $k\ne j$, column orthogonality now reads
+\[
+ 0=(A^{\mathsf T}A)_{jk}
+   =x_jx_k\sum_{\lambda_i=0}t_i^2.
+\]
+As $x_j\ne0$ and the sum is positive, $x_k=0$ for every $k\ne j$.
+Thus all zero-weight rows lie on the $j$th coordinate axis.
+
+Let $q$ be their number. Since each row has squared norm at most $1$
+and column $j$ has energy $m+\delta$, we have $q\ge m+1$.
+The remaining two columns would then satisfy
+\[
+ 2(m+\delta)
+ =\sum_{\lambda_i>0}\sum_{k\ne j}a_{ik}^2
+ \le n-q\le2m.
+\]
+\end{proof}
+
+For $n=3m+2$, the kernel cases need a separate argument
+(see \cref{lem:r2-all-active}).  We use positivity of the row weights
+in the support bound below.
+
+\subsection{Second-order reduction of row support}
+The next arguments apply when a full-support row occurs.
+Positive definiteness of each multiplier matrix makes a strict
+second-order descent possible whenever too many entries are nonzero.
+
+\begin{lemma}[A full row forces positive definiteness]\label{lem:full-pd}
+Suppose every row multiplier is positive in every normalized system.
+If $A$ has a row with three nonzero entries, every multiplier matrix $S$
+is positive definite.
+\end{lemma}
+\begin{proof}
+Change column signs so that a full row is $u>0$. Since it is saturated,
+\[
+ \mathbf1^{\mathsf T}u=1,\qquad Su=\lambda\mathbf1,
+ \qquad \lambda>0.
+\]
+Put $M=S-\lambda\mathbf1\mathbf1^{\mathsf T}$. By
+\eqref{eq:multiplier-bounds} and $Mu=0$,
+\[
+ M_{ii}\ge0,\qquad M_{ij}\le\min(M_{ii},M_{jj}).
+\]
+Indeed, $\lambda=\sum_jS_{ij}u_j\le S_{ii}\sum_j u_j=S_{ii}$.
+We first show $M\succeq0$.
+
+If all off-diagonal entries of $M$ are nonpositive, then
+\[
+ \diag(u)M\diag(u)
+ =\sum_{i<j}(-u_i u_j M_{ij})
+   (e_i-e_j)(e_i-e_j)^{\mathsf T}\succeq0.
+\]
+Here we used $Mu=0$. Otherwise choose $i\ne j$ with $M_{ij}>0$.
+Since $M_{ii},M_{jj}\ge M_{ij}$, the principal block
+\[
+ \begin{pmatrix}M_{ii}&M_{ij}\\M_{ij}&M_{jj}\end{pmatrix}
+ \succeq0.
+\]
+For any $z\in\R^3$, subtract $(z_\ell/u_\ell)u$, where
+$\{i,j,\ell\}=\{1,2,3\}$. The new vector has $\ell$th coordinate zero,
+and its quadratic form under $M$ is unchanged. Thus $M\succeq0$ in
+both cases, and $S=M+\lambda\mathbf1\mathbf1^{\mathsf T}\succeq0$.
+
+Suppose $S$ is singular, and choose $x\ne0$ with $Sx=0$. Then
+\[
+ 0=x^{\mathsf T}Sx=x^{\mathsf T}Mx
+    +\lambda(\mathbf1^{\mathsf T}x)^2,
+ \qquad \mathbf1^{\mathsf T}x=0.
+\]
+Choose opposite-sign coordinates $x_j,x_k$, one of which is the unique
+coordinate of its sign. For the third coordinate $x_\ell$,
+$|x_j|+|x_k|>|x_\ell|$. Since all $\lambda_i>0$, we have
+$g_i^{\mathsf T}x=0$ for every row. If $a_{ij}a_{ik}<0$, then
+\[
+ |g_{ij}x_j+g_{ik}x_k|=|x_j|+|x_k|
+ >|x_\ell|\ge|g_{i\ell}x_\ell|,
+\]
+contrary to $g_i^{\mathsf T}x=0$. Hence every
+$a_{ij}a_{ik}\ge0$. The full positive row makes one product strict,
+so
+\[
+ 0=(A^{\mathsf T}A)_{jk}=\sum_i a_{ij}a_{ik}>0,
+\]
+contradicting column orthogonality. Therefore $S$ is positive definite.
+\end{proof}
+
+\begin{lemma}[Fixed-Gram curves with prescribed derivatives]
+\label{lem:fixed-gram-jets}
+Let $A\in\R^{n\times3}$ be feasible at level $s>0$. Suppose that
+$H,W\in\R^{n\times3}$ satisfy
+\[
+ A^{\mathsf T}H+H^{\mathsf T}A=0,\qquad
+ A^{\mathsf T}W+W^{\mathsf T}A=-2H^{\mathsf T}H.
+\]
+There is a differentiable curve $\Gamma$ in $\mathcal M_s$, defined on
+a neighborhood of $0$, whose derivative is differentiable at $0$ and
+for which
+\[
+ \Gamma(0)=A,\qquad \Gamma'(0)=H,\qquad \Gamma''(0)=W.
+\]
+\end{lemma}
+\begin{proof}
+For a tangent matrix $V$, define its skew-symmetric lift by
+\[
+ L_A(V)=s^{-1}(VA^{\mathsf T}-AV^{\mathsf T})
+       -s^{-2}A(A^{\mathsf T}V)A^{\mathsf T}.
+\]
+The identities $A^{\mathsf T}A=sI_3$ and
+$V^{\mathsf T}A=-A^{\mathsf T}V$ give
+$L_A(V)^{\mathsf T}=-L_A(V)$ and $L_A(V)A=V$.
+Put $\Omega=L_A(H)$. Since $\Omega A=H$,
+\[
+ A^{\mathsf T}\Omega^2A
+ = (\Omega^2A)^{\mathsf T}A=-H^{\mathsf T}H.
+\]
+It follows that $R=W-\Omega^2A$ is tangent. Thus
+$\Psi=L_A(R)$ is skew-symmetric and $\Psi A=R$.
+
+Set
+\[
+ X(t)=\tfrac12t\Omega+\tfrac14t^2\Psi,\qquad
+ Q(t)=(I_n+X(t))(I_n-X(t))^{-1},\qquad
+ \Gamma(t)=Q(t)A.
+\]
+The inverse exists near $0$. Because $X(t)$ is skew-symmetric,
+the Cayley transform $Q(t)$ is orthogonal, so
+$\Gamma(t)^{\mathsf T}\Gamma(t)=sI_3$.
+The entries of $Q(t)$ are rational functions without poles near $0$.
+Differentiating at $0$ gives
+\[
+ Q(0)=I_n,\qquad Q'(0)=\Omega,\qquad
+ Q''(0)=\Omega^2+\Psi.
+\]
+Multiplication by $A$ gives the prescribed derivatives, since
+$(\Omega^2+\Psi)A=\Omega^2A+R=W$.
+\end{proof}
+
+\Needspace{12\baselineskip}
+\begin{lemma}[Strict second-order descent]\label{lem:second-order}
+Let $H\in T_A\mathcal M_s$ annihilate every active facet.
+If
+\begin{equation}\label{eq:strict-curvature}
+ \tr(SH^{\mathsf T}H)>0
+\end{equation}
+for every normalized multiplier matrix, then $A$ is not a local minimizer
+of $h$ on $\mathcal M_s$.
+\end{lemma}
+\begin{proof}
+Put $W_0=-s^{-1}AH^{\mathsf T}H$. It satisfies
+$A^{\mathsf T}W_0+W_0^{\mathsf T}A=-2H^{\mathsf T}H$.
+There exists $K\in T_A\mathcal M_s$ for which every active facet is
+negative on $W_0+K$. Otherwise the strict affine alternative would give
+a convex combination of active facets vanishing on the tangent space
+and nonnegative on $W_0$. Its multiplier matrix $S$ would satisfy
+\[
+ \langle AS,W_0\rangle=-\tr(SH^{\mathsf T}H)<0,
+\]
+a contradiction. Put $W=W_0+K$ and apply
+\cref{lem:fixed-gram-jets}. For the resulting curve $\Gamma$ and every
+active facet $\ell$,
+\[
+ \ell(\Gamma(t))
+ =1+\tfrac12t^2\ell(W)+o(t^2)<1
+\]
+for all sufficiently small positive $t$, since $\ell(H)=0$ and
+$\ell(W)<0$. Each inactive facet remains strictly below $1$ by
+continuity. There are only finitely many facets, so these inequalities
+hold simultaneously for all sufficiently small positive $t$. Hence
+$h(\Gamma(t))<h(A)$ there, which rules out a local minimum at $A$.
+\end{proof}
+
+\begin{proposition}[Support bound in the presence of a full row]
+\label{prop:support-bound}
+Suppose all row multipliers are positive in every normalized system,
+and at least one row of $A$ is full. Let $Q$ count rows with exactly two
+nonzero entries and $F$ count rows with exactly three. Then
+\begin{equation}\label{eq:support-bound}
+ Q+2F\le5.
+\end{equation}
+\end{proposition}
+\begin{proof}
+Let $Z$ be the number of zero entries. Restrict tangent vectors $H$ to
+vanish at these entries. All active facets of a given row then induce
+the same linear equation on $H$. The $n$ row equations have at least
+one dependence on the tangent space: for every tangent vector $H$,
+\[
+ \sum_i\lambda_i g_i^{\mathsf T}h_i
+ =\langle AS,H\rangle=0.
+\]
+Thus their rank is at most $n-1$.  Since
+$\dim\mathcal M_s=3n-6$, the space annihilating all active facets
+has dimension at least
+\[
+ 3n-6-Z-(n-1)=2n-5-Z.
+\]
+A nonzero vector $H$ in this space would satisfy
+\eqref{eq:strict-curvature} for every multiplier because
+all multiplier matrices are positive definite by
+\cref{lem:full-pd}. This contradicts \cref{lem:second-order}.
+Thus $Z\ge2n-5$. All rows are nonzero. If $P$ is the number of pure
+rows, then $n=P+Q+F$ and $Z=2P+Q$, giving \eqref{eq:support-bound}.
+\end{proof}
+
+\begin{remark}
+We use $Q+2F\le5$ only when a full row exists and all row weights
+are positive.  The second-order argument requires the curvature
+condition for every normalized multiplier, not just one of them.
+\end{remark}
+
+\Needspace{12\baselineskip}
+\subsection{Pair rows and the acyclic graph}
+Assume all rows are saturated, all multipliers are positive, and there
+are no full rows. If a pair row meets columns $j,k$ with magnitudes $a,b$
+and product sign $\varepsilon$, then $a+b=1$ and
+\begin{equation}\label{eq:pair-stationarity}
+ (S_{jj}-\varepsilon S_{jk})a
+ =(S_{kk}-\varepsilon S_{jk})b.
+\end{equation}
+Both factors are strictly positive for any pair that occurs. Indeed,
+equality $|S_{jk}|=S_{jj}$ in the sum proving
+\eqref{eq:multiplier-bounds} would force a single product sign on every
+overlapping row, contrary to column orthogonality and positive row weights.
+It follows that $a>b$ precisely when $S_{jj}<S_{kk}$.
+The \emph{pair-support graph} has vertex set $\{1,2,3\}$, one vertex
+for each column. The pair $\{j,k\}$ occurs as an edge when at least
+one row has support exactly $\{j,k\}$. If such rows are unbalanced,
+orient the edge $j\to k$ when their larger entries are in column $j$.
+The preceding stationarity equation ensures that this orientation is
+consistent across rows on the same pair. In the directed graph, a
+\emph{source} has no incoming edges and a \emph{sink} has no outgoing
+edges. Once balanced rows are excluded, the graph is acyclic because
+$S_{jj}<S_{kk}$ along each arrow $j\to k$.
+
+For an edge $j\to k$, let $b_i$ be the magnitude in column $k$ of
+row $i$ supported on $\{j,k\}$, so its magnitude in column $j$ is
+$1-b_i$. Define the \emph{incoming energy} and \emph{outgoing energy
+deficit} of the edge by
+\[
+ E_{jk}=\sum_{i:\,\supp(a_i)=\{j,k\}} b_i^2,
+ \qquad
+ D_{jk}=\sum_{i:\,\supp(a_i)=\{j,k\}}(2b_i-b_i^2).
+\]
+These names refer to squared mass in the smaller coordinates and to
+the loss of squared mass from the larger coordinates, respectively,
+since $1-(1-b_i)^2=2b_i-b_i^2$.
+For a vertex $j$ we write
+\[
+ E_j^{\mathrm{in}}=\sum_{h\to j}E_{hj},\qquad
+ D_j^{\mathrm{out}}=\sum_{j\to h}D_{jh}.
+\]
+All edge sums concern rows, not geometric lengths in the graph.
+\par\smallskip
+\begin{figure}[H]
+\centering
+\includegraphics[width=.67\linewidth]{pair_support_graph.pdf}
+\caption{Possible orientation of a pair-support graph on three coordinates.
+A displayed arrow $j\to k$ means that pair rows are supported on
+$\{j,k\}$ and are larger in coordinate $j$. Some arrows may be absent.}
+\label{fig:pair-support-graph}
+\end{figure}
+\par
+The transfer inequality below will be used in both residue classes.
+Balanced pair rows are treated separately in the residue analysis.
+
+\Needspace{16\baselineskip}
+\subsection{Energy transfer along pair rows}
+
+\begin{lemma}[An edge transfer bound]\label{lem:edge-transfer}
+Consider saturated pair rows whose larger coordinate is in one fixed
+column and whose smaller coordinate is in another. Suppose
+the signed column products sum to zero. Let $E$ be the sum
+of the squared smaller coordinates, let $L$ be the sum of
+the row losses, and put $D=L+E$. Then
+\begin{equation}
+ L\ge2E,
+ \qquad L\ge2\sqrt{2E}-2E,
+ \qquad D\ge3E.
+ \label{eq:edge-loss}
+\end{equation}
+An \emph{edge group} is the set of pair rows supported on one fixed
+coordinate pair and oriented in the same direction. The same
+inequalities hold when several groups use disjoint sets of rows.
+Their coordinate pairs may share a column, and $E,L,D$ are then
+summed over all groups. If $D<3/2$, then
+\begin{equation}
+ E\le B(D):=2\left(1-\sqrt{1-D/2}\right)^2.
+ \label{eq:edge-inverse}
+\end{equation}
+Moreover $0\le B'(D)<1$ for $0\le D<3/2$.
+\end{lemma}
+
+\begin{proof}
+Write the pair magnitudes as $(1-b_i,b_i)$, where
+$0<b_i<1/2$. Column orthogonality makes the positive and negative signed-product
+sums equal to the same number $P\ge0$.  Hence
+$L=2\sum_i b_i(1-b_i)=4P$.  Since $b_i<1/2$,
+we also have $L\ge2E$.  If $P\le1/4$, put
+\[
+ q=\frac{1-\sqrt{1-4P}}2.
+\]
+Each product $b_i(1-b_i)$ is at most $P=q(1-q)$.
+The function $u(1-u)$ increases on $0\le u\le1/2$, so
+$b_i\le q$.  For either sign group,
+\[
+ \sum b_i^2
+ \le\frac{q}{1-q}\sum b_i(1-b_i)
+ =\frac{qP}{1-q}=q^2.
+\]
+Thus $E\le2q^2$, and monotonicity of
+$2\sqrt{2E}-2E$ on $0\le E\le1/2$ gives
+\[
+ L=4q(1-q)\ge2\sqrt{2E}-2E.
+\]
+If $P>1/4$, then $L>1$, whereas
+$2\sqrt{2E}-2E\le1$ for all $E\ge0$.
+For edge groups with disjoint sets of rows, add the inequalities
+and use $\sum_e\sqrt{E_e}\ge\sqrt{\sum_eE_e}$.
+
+If $D<3/2$, then $E\le D/3<1/2$.  Combining $D=L+E$
+with the nonlinear loss estimate yields
+$D\ge2\sqrt{2E}-E$.  The right side is strictly increasing for
+$0\le E<1/2$.  Solving this inequality on that branch gives
+\eqref{eq:edge-inverse}.
+Finally
+\[
+ B'(D)=\frac1{\sqrt{1-D/2}}-1<1
+ \qquad(0\le D<3/2).
+\]
+\end{proof}
+
+
+
+\subsection{Normal forms with full-support rows}
+The classification below applies in either nonzero residue class once
+all row multiplier weights are known to be positive. That hypothesis
+is established in \cref{lem:active-r1,lem:r2-all-active}.
+
+\Needspace{16\baselineskip}
+\begin{lemma}[Full-row normal forms]
+\label{lem:full-row-classification}
+Let $A$ be an optimal $n\times3$ feasible matrix with
+$n=3m+r$, $r\in\{1,2\}$, and
+$A^{\mathsf T}A=(m+\delta)I_3$, where $0<\delta<1/2$.
+Assume that every normalized multiplier system for $A$ has strictly
+positive row weights and that at least one row is full.  Then
+$F\in\{1,2\}$, and after row and column permutations and sign changes,
+the non-pure rows have exactly one of the following forms.
+\begin{enumerate}
+\item One full row and three pair rows:
+\begin{equation}
+ (a,b,c),\quad(1-x,-x,0),\quad(1-y,0,-y),\quad(0,1-z,-z),
+ \label{eq:one-full-form}
+\end{equation}
+where $a,b,c>0$, $a+b+c=1$, $0<x,y,z<1/2$, and
+\[
+ x(1-x)=ab,\qquad y(1-y)=ac,\qquad z(1-z)=bc.
+\]
+In particular, $x<\min(a,b)$, $y<\min(a,c)$, and
+$z<\min(b,c)$.
+\item Two full rows and one pair row:
+\begin{equation}
+ (a,b,c),\quad(a,-b,c),\quad(g,0,-h),
+ \label{eq:two-full-form}
+\end{equation}
+where all five parameters are positive,
+$a+b+c=g+h=1$, and $2ac=gh$.
+\end{enumerate}
+\end{lemma}
+\begin{proof}
+If $F=1$, each of its three nonzero column products must be canceled
+by a pair row on the same two columns.  Thus $Q\ge3$, while
+$Q+2F\le5$ gives $Q=3$.  Consequently there is exactly one pair row
+for each of the three column pairs.  Make the full row positive by
+changing column signs.  The product of the two nonzero entries in
+each pair row must be negative.  No pair can be balanced, since a
+balanced pair has product magnitude $1/4$ whereas
+$ab,ac,bc<1/4$.
+
+The stationarity equations \eqref{eq:pair-stationarity} for a pair with positive magnitudes $u,v$
+and product sign $\varepsilon$ give
+\[
+ (S_{jj}-\varepsilon S_{jk})u
+   =(S_{kk}-\varepsilon S_{jk})v.
+\]
+Both factors are nonnegative by the multiplier bounds.  If one
+vanished, the equation would force the other to vanish, contrary to
+$S\succ0$.  Thus both are positive, and the larger coordinate is the
+one with smaller diagonal entry of $S$.  Since the three pairs are
+unbalanced, these strict inequalities define an acyclic orientation
+of the complete graph on three vertices, hence a transitive ordering.
+After relabeling, this gives \eqref{eq:one-full-form}.  For example,
+$x(1-x)=ab$ and $a+b<1$ imply $x<\min(a,b)$: writing
+$t=\min(a,b)<1/2$, one has $ab<t(1-t)$, and the function
+$u\mapsto u(1-u)$ is strictly increasing for $0\le u<1/2$.
+The other comparisons are analogous.
+
+If $F=2$, two full rows alone cannot cancel all three column products.
+Indeed, the product of the three pairwise coordinate products of any
+full row is positive, whereas canceling all three products would
+require the corresponding products of the other row all to have
+opposite signs.  Thus $Q\ge1$, and $Q+2F\le5$ gives $Q=1$.
+Place this pair in columns one and three and make the first full row
+$(a,b,c)>0$.  Orthogonality of column two with columns one and three
+forces the second full row to be
+$(ta,-b/t,tc)$ for some $t>0$.
+The two full-row budgets give $a+b+c=1$ and
+$t(a+c)+b/t=1$.  Multiplying the latter equality by $t$ yields
+\[
+ (t-1)\bigl(t(1-b)-b\bigr)=0.
+\]
+If $t\ne1$, then $t=b/(1-b)$, so the second column of these full rows
+contributes $b^2+(1-b)^2\in[1/2,1)$ to its squared norm.
+Adding an integer number of unit coordinate rows cannot make this
+contribution equal to the fractional part $\delta\in(0,1/2)$.
+Thus $t=1$, yielding \eqref{eq:two-full-form}.  Finally,
+$F\ge3$ contradicts $Q+2F\le5$.
+\end{proof}
+
+% END sections/variational
+% BEGIN sections/r1
+\section{The residue class \texorpdfstring{$n\equiv1\pmod3$}{n = 1 modulo 3}}
+\label{sec:residue-one}
+
+Write $n=3m+1$ and $s=m+\delta$ for an optimal frame.
+The constructions give $\delta>0$.  By \cref{lem:dominance,cor:two-dimensional},
+
+\begin{equation}
+  0<\delta\le (2+\sqrt3)^{-2}<\frac{72}{1000},\qquad
+  E\le\frac{(1-\sqrt{3\delta})^2}{2}<\frac12,
+  \label{eq:r1-preliminary}
+\end{equation}
+Here $E$ is precisely the nondominant squared mass defined in
+\cref{lem:dominance}: it sums $a_{ij}^2$ over positions where column
+$j$ is not dominant for row $i$. The counts of rows dominant in each
+column are $(m+1,m,m)$, up to a permutation of the columns.
+By \cref{lem:active-r1}, every row is saturated and has positive weight.
+
+\subsection{The two algebraic parameters}\label{sec:algebraic-parameters}
+
+The constants $\delta_1,\delta_2$ in the main theorem are defined
+by two explicit equations below. They arise from small matrices with
+two orthogonal columns of the form
+\[
+ R=\begin{pmatrix}xC&yS\\xS&-yC\end{pmatrix},
+ \qquad C^2+S^2=1.
+\]
+The columns of $R$ have squared norms $x^2$ and $y^2$ and are
+orthogonal.  The row-budget equalities for the corresponding frames
+lead to two linear systems in $C,S$.  Solving them yields the
+following scalar functions on $0\le y\le27/100$:
+\begin{align*}
+ x_1(y)&=\sqrt{1+y^2},&
+ C_1(y)&=x_1(y)(\sqrt2-x_1(y))-y,\\
+ &&S_1(y)&=x_1(y)-y(\sqrt2-x_1(y)),\\
+ x_2(y)&=\sqrt{2+y^2},&
+ C_2(y)&=\tfrac12\bigl(x_2(y)(\sqrt2-y)-y\bigr),\\
+ &&S_2(y)&=\tfrac12\bigl(x_2(y)-y(\sqrt2-y)\bigr).
+\end{align*}
+We use \emph{root isolation} to mean proving that an equation has
+exactly one real root in a specified rational interval.
+The defining equations for our two exceptional parameters are
+\begin{equation}\label{eq:root-equations}
+ C_j(y)^2+S_j(y)^2=1\qquad(j=1,2).
+\end{equation}
+The next lemma proves that each equation has exactly one root
+$y_j$ in $[0,27/100]$.  We set $\delta_1=y_1^2$ and $\delta_2=y_2^2$.
+The parametrizations are recovered from the row budgets in
+\cref{prop:r1-two-full}.
+
+\begin{lemma}[Existence, uniqueness, and isolation]
+\label{lem:root-isolation}
+For $j=1,2$, equation \eqref{eq:root-equations} has a unique solution
+$y_j$ in $[0,27/100]$.  These solutions satisfy
+\[
+ 0<y_1<\frac{17}{100},\qquad
+ \frac{347}{2000}<y_2<\frac7{40}.
+\]
+With $\delta_j=y_j^2$ and $\delta_*=15-4\sqrt{14}$, one has
+\begin{equation}
+ 0<\delta_1<\frac{3}{100}<\delta_2<\frac{49}{1600}<\delta_*.
+ \label{eq:exceptional-order}
+\end{equation}
+\end{lemma}
+\begin{proof}
+All four functions $C_j,S_j$ are positive on $[0,27/100]$.
+For the first pair, this follows, for example, from
+$\sqrt2>7/5$, $1\le x_1<26/25$, and $y\le27/100$.
+Their derivatives are
+\[
+ C_1'=\frac{\sqrt2\,y}{x_1}-2y-1,
+ \qquad
+ S_1'=x_1+\frac{y(1+y)}{x_1}-\sqrt2.
+\]
+Both are negative: for the second derivative expression use
+$x_1<26/25$, $y(1+y)/x_1\le3429/10000$, and $\sqrt2>7/5$.
+For the second pair,
+\[
+ C_2'=\frac12\left(\frac{y(\sqrt2-y)}{x_2}-x_2-1\right),
+ \qquad
+ S_2'=\frac12\left(\frac{y}{x_2}-\sqrt2+2y\right),
+\]
+which are negative using $x_2\ge\sqrt2>7/5$ and $y\le27/100$.
+Thus $C_j^2+S_j^2$ is strictly decreasing.
+
+At $y=0$, the two squared sums are $4-2\sqrt2>1$ and $3/2>1$.
+At $y=17/100$, the first sum is less than one. The second sum is
+greater than one at $y=347/2000$ and less than one at $y=7/40$.
+These rational endpoint checks are given in
+\cref{app:root-arithmetic}. Continuity and strict monotonicity
+then give the stated isolations.
+
+Squaring the root bounds gives the first two comparisons in
+\eqref{eq:exceptional-order}. The last follows from
+\[
+ 23951^2-14\cdot6400^2=210401>0,
+\]
+which gives $\sqrt{14}<23951/6400$ and hence
+$49/1600<15-4\sqrt{14}$.
+\end{proof}
+
+\paragraph{The known four-dimensional value.}
+Our parameter $x_0=1+\delta_1$ satisfies
+\[
+ 4x_0^4-28x_0^3-7x_0^2+16x_0+16=0,
+ \qquad 1<x_0<\frac43,
+\]
+which is the polynomial appearing in \cite{Shultz2013}.
+For completeness, eliminating the square roots from the defining
+equation for $y_1$ gives the necessary relation
+\[
+ (2y^4+4y^3+y^2-1)(2y^4+4y^3+y^2+8y-1)=0.
+\]
+The first factor is negative throughout $0<y<17/100$, the
+interval containing $y_1$. Hence the second factor vanishes
+at $y_1$. Substituting $x_0=1+y_1^2$
+then gives the displayed quartic.
+
+
+\begin{proposition}[Exceptional frames]
+\label{prop:exceptional-frames}
+There are feasible four-row and seven-row frames with Gram matrices
+$(1+\delta_1)I_3$ and $(2+\delta_2)I_3$, respectively.
+\end{proposition}
+\begin{proof}
+In the four-row construction put $y=y_1$, $x=\sqrt{1+y^2}$,
+$C=C_1(y)$, and $S=S_1(y)$.  The rows are
+\begin{equation}
+ \left(\frac{xC}{\sqrt2},\frac{x}{\sqrt2},\frac{yS}{\sqrt2}\right),\quad
+ \left(\frac{xC}{\sqrt2},-\frac{x}{\sqrt2},\frac{yS}{\sqrt2}\right),\quad
+ (xS,0,-yC),\quad (0,0,1).
+ \label{eq:four-frame}
+\end{equation}
+The equations $C^2+S^2=1$,
+$xC+yS=\sqrt2-x$, and $xS+yC=1$ show that all row budgets equal one.
+For example, the first two rows both have $\ell^1$-norm
+$(xC+x+yS)/\sqrt2=1$, since the negative sign in the second row
+disappears under absolute values.  The third row has norm
+$xS+yC=1$.  The first and third columns are orthogonal because their two
+contributions $xyCS$ and $-xySC$ cancel.  The signs in the first two
+rows cancel the other off-diagonal entries.  The diagonal entries are
+$x^2,x^2,1+y^2$, as required.
+
+For seven rows put $y=y_2$, $x=\sqrt{2+y^2}$,
+$C=C_2(y)$, and $S=S_2(y)$.  Take
+\begin{equation}
+ \left(\frac{xC}{\sqrt2},\frac{y}{\sqrt2},\frac{yS}{\sqrt2}\right),\quad
+ \left(\frac{xC}{\sqrt2},-\frac{y}{\sqrt2},\frac{yS}{\sqrt2}\right),\quad
+ (xS,0,-yC),\quad e_2,e_2,e_3,e_3.
+ \label{eq:seven-frame}
+\end{equation}
+Here $xC+yS=\sqrt2-y$ and $xS+yC=1$.  The same calculation gives row
+budgets one and Gram matrix $(2+y^2)I_3$.
+\end{proof}
+
+\subsection{Full-row cases in the first residue class}
+By \cref{lem:active-r1}, the positivity hypothesis of
+\cref{lem:full-row-classification} holds for an optimum in this
+residue class. We now bound its two possible full-row configurations.
+
+\begin{proposition}[One full row in the first residue class]
+\label{prop:r1-one-full}
+A $(3m+1)$-row optimum cannot have exactly one full row if $m=1$,
+or if $\delta\ge3/100$.
+\end{proposition}
+\begin{proof}
+Let $p_j$ count the pure rows in coordinate $j$.  In the normal form \eqref{eq:one-full-form}, the cancellation
+relations and $x,y,z<1/2$ give $y^2<ac$ and $z^2<bc$.
+Thus the mixed contribution to column three satisfies
+\[
+ c^2+y^2+z^2<c^2+c(a+b)=c<1.
+\]
+Since the total energy in this column is $m+\delta$ with
+$0<\delta<1/2$, its pure-row count is $p_3=m$.
+The mixed squared mass in the second column is
+$b^2+x^2+(1-z)^2$. Since $x<a$ and $a+b<1$, we have
+$b^2+x^2<b^2+a^2<(a+b)^2<1$. Also $(1-z)^2<1$.
+Hence the second mixed contribution is positive and less than $2$, giving
+$p_2\in\{m-1,m\}$. The mixed squared mass in the first column is
+$a^2+(1-x)^2+(1-y)^2$, which is positive and less than $3$.
+Therefore $m-2\le p_1\le m$.  Since $p_1+p_2+p_3=3m-3$, necessarily
+\[
+ (p_1,p_2,p_3)=(m-2,m-1,m).
+\]
+This is impossible for $m=1$.  Otherwise the diagonal equations become
+\begin{align}
+ \delta&=3a^2-2a-x^2-y^2,\label{eq:r1-full-a}\\
+ \delta&=b^2+x^2-2bc-z^2,\label{eq:r1-full-b}\\
+ \delta&=c^2+y^2+z^2.\label{eq:r1-full-c}
+\end{align}
+The first equation gives $a>2/3$ and thus $b+c<1/3$.
+Since $z<\min(b,c)<1/6$,
+\[
+ \frac{z}{c}=\frac{b}{1-z}<\frac25.
+\]
+If $\delta\ge3/100$, \eqref{eq:r1-full-c} gives
+$\delta<(54/25)c^2$ and hence $c>117/1000$.
+Equation~\eqref{eq:r1-full-b} gives
+$\delta<2b(b-c)$, whence $b>193/1000$.
+Consequently $a<69/100$ and $b+c>31/100$.
+Moreover, $x>ab>(2/3)b$ and $y>ac>(2/3)c$.  Returning to
+\eqref{eq:r1-full-a}, we obtain
+\[
+ \delta<3\left(\frac{69}{100}\right)^2
+           -2\left(\frac{69}{100}\right)
+           -\frac29\left(\frac{31}{100}\right)^2
+       =\frac{97}{3600}<\frac3{100},
+\]
+a contradiction.
+\end{proof}
+
+\begin{proposition}[Two full rows in the first residue class]
+\label{prop:r1-two-full}
+In the normal form \eqref{eq:two-full-form}, a $(3m+1)$-row optimum has
+$\delta=\delta_1$ or $\delta=\delta_2$.  The latter case requires $m\ge2$.
+\end{proposition}
+\begin{proof}
+Let $p_j$ count the pure rows in column $j$. Every mixed column
+has positive squared energy, so $p_j\le m$. The second column has
+mixed energy $2b^2\in(0,2)$, giving $p_2=m-1$ or $p_2=m$.
+There are three mixed rows, so $p_1+p_2+p_3=3m-2$.
+These bounds determine the alternatives below.
+\Needspace{12\baselineskip}
+The two-by-two matrix
+\[
+ R=\begin{pmatrix}\sqrt2\,a&\sqrt2\,c\\g&-h\end{pmatrix}
+\]
+has orthogonal columns. The original two full rows have the common
+budget $a+b+c=1$, while the pair row has budget $g+h=1$.
+After compression, the two row norms of $R$ are therefore
+\[
+ \norm{R_{1,*}}_1=\sqrt2(a+c)=\sqrt2(1-b),\qquad
+ \norm{R_{2,*}}_1=g+h=1.
+\]
+In particular, the first row of $R$ need not have unit $\ell^1$-norm.
+These are the budget identities used in both cases below.
+
+If $p_2=m-1$, then, after interchanging columns one and three if
+necessary, $(p_1,p_3)=(m-1,m)$.  Put $y=\sqrt\delta$ and
+$x=\sqrt{1+\delta}$.  Orthogonality and positivity give
+\[
+ R=\begin{pmatrix}xC&yS\\xS&-yC\end{pmatrix},\qquad C,S>0,\quad C^2+S^2=1.
+\]
+Since $b=x/\sqrt2$, the row budgets say
+$xC+yS=\sqrt2-x$ and $xS+yC=1$.  Solving gives
+$C=C_1(y)$ and $S=S_1(y)$.  By \eqref{eq:r1-preliminary},
+$y<27/100$, so Lemma~\ref{lem:root-isolation} gives $\delta=\delta_1$.
+
+If $p_2=m$, then $(p_1,p_3)$ is $(m-1,m-1)$ or $(m-2,m)$ up to
+interchange.  In the first case $R^{\mathsf T}R=(1+\delta)I_2$,
+so $g^2+h^2=1+\delta>1$, contrary to $g+h=1$.
+In the second case put $x=\sqrt{2+\delta}$, $y=\sqrt\delta$.
+The same parametrization yields
+$xC+yS=\sqrt2-y$ and $xS+yC=1$.
+Now $C=C_2(y)$, $S=S_2(y)$, and $\delta=\delta_2$.
+The pure count $p_1=m-2$ requires $m\ge2$.
+\end{proof}
+
+\Needspace{14\baselineskip}
+\subsection{Frames with no full row}
+
+\begin{proposition}[The first residue class without full rows]
+\label{prop:r1-no-full}
+If a $(3m+1)$-row optimum has no full row, then $\delta\le\delta_*$.
+Such an optimum is impossible when $m=1$, and when $m=2$ it satisfies
+$\delta<3/100$.
+\end{proposition}
+\begin{proof}
+Orient every pair from its dominant coordinate to its nondominant
+coordinate.  The multiplier equations make this a directed acyclic
+graph.  Let $E_j$ be the total incoming nondominant squared energy at
+column $j$.  The two columns with $m$ dominant rows satisfy
+$E_j\ge\delta$, because their dominant entries contribute squared
+energy at most $m$ whereas their total is $m+\delta$.
+In the absence of full rows, column orthogonality holds separately
+for each pair of columns, so the edge transfer bound applies.
+
+For an edge with incoming energy $E_e$ and loss $L_e$, Lemma~\ref{lem:edge-transfer} gives
+\[
+ L_e\ge\phi(E_e),\qquad
+ \phi(t)=2\sqrt{2t}-2t.
+\]
+The function $\phi$ is increasing on $[0,1/2]$ and satisfies
+$\phi(u)+\phi(v)\ge\phi(u+v)$.  Since the total nondominant energy is
+less than $1/2$ by \eqref{eq:r1-preliminary}, grouping edges by target
+and using the two columns with only $m$ dominant rows gives
+\[
+ 1-3\delta=\sum_e L_e
+       \ge2\phi(\delta)=4\sqrt{2\delta}-4\delta.
+\]
+On the preliminary interval for $\delta$, this is equivalent to
+$\delta\le15-4\sqrt{14}$.
+
+Every occurring edge needs at least two pair rows with opposite
+product signs, since its signed products must cancel.  Every source
+of the acyclic graph must be the unique column with $m+1$ dominant
+rows: a source with only $m$ dominant rows has no incoming energy,
+so its squared column norm would be at most $m$.  Both other columns
+need incoming energy, and hence each must be reached from that source.
+
+When $m=1$, the source has only two dominant rows.  It cannot branch
+into two distinct edges, since that would require at least four rows.
+If the two columns with only $m$ dominant rows instead form a chain,
+the middle vertex
+would need two outgoing dominant rows but has only one.  Both
+possibilities are impossible.
+
+When $m=2$, the source has three dominant rows, so it still cannot
+branch.  Both deficient vertices must receive energy, hence the
+orientation is a chain $1\to2\to3$.  The middle vertex has exactly
+two dominant rows, and both belong to its outgoing edge.  Write their
+nondominant magnitudes as $b_1,b_2$.  The sink has two pure rows,
+so $b_1^2+b_2^2=\delta$.  The middle column has energy
+\[
+ 2+\delta=(1-b_1)^2+(1-b_2)^2+E_{12}.
+\]
+Using $b_1^2+b_2^2=\delta$ gives
+\[
+ E_{12}=2(b_1+b_2)\ge2\sqrt\delta.
+\]
+If $\delta\ge3/100$, this would imply
+$E\ge2\sqrt{3/100}>3/10$, whereas
+\eqref{eq:r1-preliminary} gives
+$E\le(1-3/10)^2/2=49/200<3/10$.
+\end{proof}
+
+\Needspace{12\baselineskip}
+\begin{theorem}[Exact values in the first residue class]
+\label{thm:r1}
+For every integer $m\ge1$, the exact values in the first nonzero
+residue class are
+\[
+ F_3(4)=1+\delta_1,\qquad F_3(7)=2+\delta_2,
+ \qquad F_3(3m+1)=m+15-4\sqrt{14}\quad(m\ge3).
+\]
+\end{theorem}
+\begin{proof}
+The frames in Proposition~\ref{prop:exceptional-frames} give the first
+two lower bounds.  The four-pair star construction gives the third.
+Consider an optimum and apply Lemma~\ref{lem:active-r1}.
+If it has a full row, the support bound and
+Lemma~\ref{lem:full-row-classification} leave the one-full and two-full
+forms.  Propositions~\ref{prop:r1-one-full} and
+\ref{prop:r1-two-full}, together with
+\eqref{eq:exceptional-order}, show that the only possible maximizing
+full-row values are $\delta_1$ at $m=1$ and $\delta_2$ at $m=2$.
+For $m\ge3$ they are strictly below the available star value.
+If there is no full row, Proposition~\ref{prop:r1-no-full} excludes
+$m=1$, falls below the available seven-row value at $m=2$, and gives
+the sharp upper bound $\delta\le\delta_*$ for $m\ge3$.
+\end{proof}
+
+% END sections/r1
+% BEGIN sections/r2
+\section{The residue class \texorpdfstring{$n\equiv2\pmod3$}{n = 2 mod 3}}
+\label{sec:residue-two}
+
+Write
+\[
+ \Delta=10-4\sqrt6=(\sqrt6-2)^2.
+\]
+Let $m\ge1$, $n=3m+2$, and let $A$ be a maximizing frame:
+
+\[
+ A^{\mathsf T}A=sI_3,\qquad s=m+\delta,\qquad
+ \sum_{j=1}^3|a_{ij}|\le1.
+\]
+Use $AS=G$ and $G_i=\lambda_i g_i$ as in \cref{lem:multipliers}.
+Here $\lambda_i\ge0$, $\sum_i\lambda_i=1$, and
+$g_i\in\partial\|a_i\|_1$.  We call row $i$ a
+\emph{zero-weight row} when $\lambda_i=0$ in the chosen multiplier
+system. This describes a multiplier weight, not a zero vector.
+Such a row need not be zero and need not saturate its row budget. A \emph{large entry} is an entry with $|a_{ij}|>1/2$.
+This condition is different from dominance in \cref{lem:dominance},
+which compares one entry with the sum of the remaining magnitudes.
+For nonnegative numbers $r_1,r_2,r_3$, the \emph{triangle inequalities}
+are $r_j\le r_k+r_\ell$ for all distinct $j,k,\ell$.
+They are \emph{strict} if all three inequalities are strict and
+\emph{degenerate} if at least one is an equality. We apply these
+terms to the absolute coordinate values of a kernel vector.
+
+\subsection{An extremal construction and preliminary bounds}
+
+The five-row matrix $A_5$ in \eqref{eq:five-core} has row
+$\ell^1$-norms equal to one and satisfies
+$A_5^{\mathsf T}A_5=(1+\Delta)I_3$.
+Appending $m-1$ copies of $I_3$ gives
+\begin{equation}
+ \F(3m+2)\ge m+\Delta.
+ \label{eq:r2-construction}
+\end{equation}
+
+\begin{proposition}\label{prop:r2-column-bounds}
+For any maximizing frame at level $m+\delta$ in dimension $3m+2$,
+\[
+ \frac15<\Delta\le\delta\le\frac49.
+\]
+Every row is nonzero.  Each column has at least $m$ entries whose
+absolute values exceed $1/2$.
+\end{proposition}
+
+\begin{proof}
+The trace bound gives $\delta\le2/3<1$.  For numbers
+$0\le c_1,\ldots,c_N\le1$ with
+$\sum_i c_i^2=m+\delta$, their sum is at least
+$m+\sqrt\delta$.  To see this, put $t_i=c_i^2$.  Minimizing
+$\sum_i\sqrt{t_i}$ over $0\le t_i\le1$ with fixed
+$\sum_i t_i=m+\delta$ reduces, by concavity of the square-root
+function, to a vector with $m$ entries equal to $1$, one equal to
+$\delta$, and the rest zero.  Its square-root sum is
+$m+\sqrt\delta$.
+Apply this observation to each column and add the row bounds:
+\[
+ 3m+3\sqrt\delta\le\sum_{i,j}|a_{ij}|\le3m+2.
+\]
+Thus $\delta\le4/9$. A zero row would instead give
+$3\sqrt\delta\le1$, contrary to \eqref{eq:r2-construction}.
+The inequality $\Delta>1/5$ follows from $6<(49/20)^2$.
+
+Let $L_i=1-\|a_i\|_2^2$ and $L=\sum_iL_i=2-3\delta$.
+If $c=|a_{ij}|\le1/2$, then
+\[
+ L_i\ge1-c^2-(1-c)^2=2c(1-c)\ge2c^2.
+\]
+Consequently, if a column had at most $m-1$ entries larger than
+$1/2$, its squared norm would be at most
+\[
+ m-1+\frac L2=m-\frac32\delta<m+\delta,
+\]
+a contradiction. A row has at most one entry larger than $1/2$.
+\end{proof}
+
+\subsection{Positivity of every row weight}
+
+The obstacle in the second residue class is the possible vanishing
+of a row multiplier. We reduce this to the support of a single
+zero-weight row. The two-coordinate case is settled by a column
+count, while a full-support row leads to strict or degenerate
+triangle inequalities in the kernel.
+
+\begin{lemma}[Kernel reduction for zero-weight rows]
+\label{lem:r2-kernel-reduction}
+Let $m\ge1$, let $A$ be a maximizing feasible frame with $3m+2$
+rows, and let $(\lambda,g,S)$ be a normalized multiplier system. If
+$\lambda_{i_0}=0$ for some row index $i_0$, write $r=a_{i_0}$.
+Then $r\ne0$, $S$ is positive semidefinite of rank two, and
+$\ker S=\R r$. The row $r$ has no strictly dominant coordinate.
+Moreover, $i_0$ is the unique zero-weight index. Every other row
+is saturated and satisfies $g_i\cdot r=0$.
+\end{lemma}
+\begin{proof}
+Fix a normalized multiplier with $\lambda_{i_0}=0$, and write
+$r=a_{i_0}$. By \cref{prop:r2-column-bounds},
+$s=m+\delta$ with $1/5<\delta\le4/9$. Its matrix $S$ satisfies
+\[
+ S_{jj}\ge0,\qquad |S_{jk}|\le\min(S_{jj},S_{kk}),
+ \qquad \operatorname{tr}S=1/s.
+\]
+The rank-one exclusion in \cref{lem:rank-one} gives
+$\operatorname{rank}S\ge2$. The assumed zero-weight row $r$
+is nonzero by \cref{prop:r2-column-bounds}. Since $AS=G$ and
+$\lambda_{i_0}=0$, we have $rS=0$, so $S$ is singular.
+Consequently $\operatorname{rank}S=2$.  Its principal minors of
+orders one and two are nonnegative, hence $S$ is positive
+semidefinite.  All zero-weight rows lie on the one-dimensional kernel
+$\R x=\ker S$. Since $r\ne0$ is in this kernel,
+$\ker S=\R r$. Every positive-weight row satisfies
+$g_i\cdot r=0$.
+
+Suppose $x$ has a strictly dominant coordinate $j$, so that
+$|x_j|>\sum_{k\ne j}|x_k|$.
+Then $a_{ij}=0$ in every
+positive-weight row. Orthogonality of columns forces all other
+coordinates of $x$ to vanish. At least $m+1$ zero-weight rows are needed to supply the
+squared column norm $s>m$, since each row has squared norm at most
+$1$.  The remaining at most $2m+1$ rows use only the other two
+columns.  Appending zero rows if necessary produces a two-dimensional
+feasible frame with $2m+1$ rows and level $s=m+\delta$.
+The two-dimensional residue estimate (Corollary~\ref{cor:two-dimensional})
+\[
+ F_2(2m+1)\le m+\frac18
+\]
+contradicts $\delta>1/5$.
+
+It follows that $x$ has no strictly dominant coordinate.
+A vector $v$ parallel to $x$ satisfies
+\[
+ \|v\|_2^2\le2\sum_{j<k}|v_jv_k|.
+\]
+Indeed, if $a$ is its largest coordinate magnitude and $b$ is the
+sum of the other magnitudes, then $a\le b$ and
+$\|v\|_2^2-2\sum_{j<k}|v_jv_k|\le(a+b)(a-b)\le0$.
+Let $q$ be the number of zero-weight rows, and let $E_0$ and
+$P_0$ denote their total squared norm and total absolute pair
+products. Their loss is $q-E_0$. Their pair products have a
+fixed sign for each column pair, so the positive-weight rows
+must have total absolute pair products at least $P_0$.
+Their loss is at least $2P_0$. Thus
+\[
+ L\ge q-E_0+2P_0\ge q.
+\]
+Since $L=2-3\delta<7/5$ and at least one such row exists,
+there is exactly one zero-weight row, namely $r$.
+All other rows have positive weight and are saturated.
+\end{proof}
+
+\Needspace{12\baselineskip}
+\begin{lemma}[Excluding two-coordinate zero-weight rows]
+\label{lem:r2-zero-weight-pair}
+For $m\ge1$, no normalized multiplier system of a maximizing frame
+with $3m+2$ rows has a zero-weight row supported on exactly two
+coordinates.
+\end{lemma}
+\begin{proof}
+Suppose a zero-weight row $r$ has support of size two.
+By \cref{lem:r2-kernel-reduction}, it is the only zero-weight row.
+After changing column signs and permuting columns, write
+$r=(t,t,0)$, where $0<t\le1/2$.
+In each positive-weight row, the first two coordinates have
+opposite signs whenever both are nonzero. This follows from
+$g_i\cdot r=0$ and $r=(t,t,0)$. Orthogonality consequently gives
+\[
+ \sum_{i\ne r}|a_{i1}a_{i2}|=t^2.
+\]
+All these rows are saturated. Define
+\[
+ P_3=\sum_{i\ne r}|a_{i3}|(|a_{i1}|+|a_{i2}|).
+\]
+The exact loss identity is
+\begin{equation}
+ L=1+2P_3,\qquad 2P_3=1-3\delta.
+ \label{eq:r2-two-kernel-loss}
+\end{equation}
+Let $p_j$ count the entries larger than $1/2$ in column $j$.
+The row $r$ contributes to none of these counts. If $p_3=m$,
+the small entries in the third column carry squared mass at
+least $\delta$. In a saturated row, a small third coordinate
+$c$ contributes $c(1-c)\ge c^2$ to $P_3$.
+Hence $P_3\ge\delta$, and \eqref{eq:r2-two-kernel-loss}
+would give $\delta\le1/5$.
+
+Hence $p_3\ge m+1$.  By \cref{prop:r2-column-bounds},
+$p_1,p_2\ge m$.  The zero-weight row $r$ has no entry larger
+than $1/2$, and the remaining $3m+1$ rows have at most one each.
+Thus the only remaining count is
+$(p_1,p_2,p_3)=(m,m,m+1)$, and every row other than $r$ has
+exactly one large coordinate.
+
+Let $J$ be the rows whose large coordinate is the third.
+For $i\ne r$ put $q_i=|a_{i1}|+|a_{i2}|$.  Since the signed first-two
+column products of the positive-weight rows sum to $-t^2$,
+\[
+ \begin{aligned}
+ 2s
+ &=2t^2+\sum_{i\ne r}(a_{i1}^2+a_{i2}^2)\\
+ &=\sum_{i\ne r}q_i^2.
+ \end{aligned}
+\]
+For the $2m$ rows dominated by the first or second coordinate,
+$q_i\le\|a_i\|_1=1$.  For $i\in J$, saturation and a large third
+entry give $q_i<|a_{i3}|$, so $q_i^2\le q_i|a_{i3}|$.
+Therefore
+\[
+ 2s\le2m+\sum_{i\in J}q_i^2\le2m+P_3.
+\]
+Thus $2\delta\le P_3$, which together with
+\eqref{eq:r2-two-kernel-loss} gives $\delta\le1/7$,
+contrary to $\delta>1/5$.
+\end{proof}
+
+\Needspace{15\baselineskip}
+\begin{lemma}[Pair-support structure around a zero-weight full row]
+\label{lem:r2-full-kernel-structure}
+Let $m\ge1$. Suppose that a normalized multiplier system of a
+maximizing frame with $3m+2$ rows has a zero-weight row $r$
+with full support.
+After column sign changes, $r_j>0$ and $r_j\le r_k+r_\ell$
+for each permutation of $\{1,2,3\}$.
+All other rows are saturated and supported on at most two columns,
+and every coordinate pair occurs. The oriented pair-support graph
+is an acyclic tournament. Every pair row has a unique coordinate
+larger than $1/2$ in absolute value. The large-entry counts are
+$(m+1,m,m)$, up to permutation, and the source has $m+1$ such entries.
+\end{lemma}
+\begin{proof}
+Suppose $r$ is a zero-weight row with all three coordinates
+nonzero. By \cref{lem:r2-kernel-reduction}, it is the only
+zero-weight row and every other row is saturated.
+Change column signs so that $r_j>0$ for all $j$.
+Its coordinates satisfy the triangle inequalities, and
+$r_j\le1/2$, since $\rho:=r_1+r_2+r_3\le1$.
+We first exclude a second full-support row $u$.
+Indeed, if $\sigma=\operatorname{sign}u$, then
+$\sigma\cdot r=0$ because $g_u\cdot r=0$ and $u$ is full.
+Consider the row rotation
+\[
+ u(\theta)=u\cos\theta+r\sin\theta,\qquad
+ r(\theta)=r\cos\theta-u\sin\theta.
+\]
+This rotation preserves the contribution
+$u^{\mathsf T}u+r^{\mathsf T}r$ to the Gram matrix.
+For sufficiently small $\theta$, $u(\theta)$ has the same coordinate
+signs as $u$, and $r(\theta)$ has positive coordinates.  Thus
+\[
+ \begin{aligned}
+ \|u(\theta)\|_1
+ &=\cos\theta\,\sigma\cdot u
+   +\sin\theta\,\sigma\cdot r=\cos\theta<1,\\
+ \|r(\theta)\|_1
+ &=\rho\cos\theta-\sin\theta\sum_j u_j.
+ \end{aligned}
+\]
+Choose the sign of a sufficiently small nonzero $\theta$ so that
+$\sin\theta\sum_j u_j\ge0$.  Since $\rho\le1$, the second norm
+is also strictly less than $1$.  The rows $u,r$ are linearly
+independent, because $\sigma\cdot u=1$ and $\sigma\cdot r=0$,
+and hence their rotated versions remain independent.
+At the new maximizing frame, these two rows are slack, so any
+normalized multiplier system gives them weight zero.  Its multiplier
+matrix must annihilate both independent rows and thus has rank at most
+one, contradicting \cref{lem:rank-one}.
+
+All remaining rows are therefore pure or supported on a pair
+of coordinates.  Since the zero-weight row $r$ has all three
+coordinates positive, column orthogonality forces at least one pair
+row on each of the three column pairs, to cancel $r_jr_k>0$.
+Every principal $2\times2$ minor of $S$ is strictly positive.
+To see this, recall that a rank-two positive semidefinite
+$3\times3$ matrix has
+$\operatorname{adj}(S)=c\,rr^{\mathsf T}$ for some $c>0$, because
+$\ker S=\R r$.  As every $r_j>0$, all diagonal cofactors, which are
+precisely the principal minors of order two, are positive.
+For a pair row, the multiplier equation reads
+\begin{equation}
+ (S_{jj}-\varepsilon S_{jk})a
+   =(S_{kk}-\varepsilon S_{jk})b,
+ \qquad a+b=1,
+ \label{eq:r2-pair-stationarity}
+\end{equation}
+where $a,b>0$ and $\varepsilon$ is the product of the two signs.
+If $S_{jj}=S_{kk}$, all rows on this pair have magnitudes
+$(1/2,1/2)$. Their signed products are then integer multiples
+of $1/4$, and cannot cancel $0<r_jr_k<1/4$.
+Thus the three diagonal entries of $S$ are distinct.
+Orient each pair from its larger coordinate to its smaller
+coordinate. Equation \eqref{eq:r2-pair-stationarity} orders
+these edges by increasing diagonal entries of $S$.
+The resulting graph is acyclic. Every positive-weight row has a
+unique large coordinate, and their counts are $(m+1,m,m)$.
+
+For each oriented edge, use the energy terms $E_{jk},D_{jk}$ defined
+before \cref{fig:pair-support-graph}. The source of this acyclic graph must be the column with
+$m+1$ large entries.  Indeed, orthogonality of columns $j,k$
+implies the absolute product sum of their pair rows is at least
+$r_jr_k$.  Since $2b_i-b_i^2\ge2b_i(1-b_i)$, an outgoing edge from
+$j$ to $k$ has deficit $D_{jk}\ge2r_jr_k$.
+If a source had only $m$ large entries, it would have no incoming
+energy, so its squared norm would be at most
+\[
+ m+r_j^2-2r_j(r_k+r_\ell)\le m,
+\]
+contradicting $m+\delta>m$.
+\end{proof}
+
+\begin{lemma}[Excluding strict-triangle zero-weight full rows]
+\label{lem:r2-strict-triangle}
+For $m\ge1$, a maximizing frame with $3m+2$ rows admits no normalized
+multiplier system with a zero-weight full-support row $r$ whose
+coordinate magnitudes satisfy all three strict triangle inequalities.
+\end{lemma}
+\begin{proof}
+Change column signs so that $r_j>0$ for all $j$.
+The pair-support graph is an acyclic tournament by
+\cref{lem:r2-full-kernel-structure}. The strict triangle
+inequalities imply that every pair row has opposite coordinate signs.  Otherwise the two nonzero entries
+of a pair-row subgradient would contribute $r_j+r_k$ in absolute
+value to $g_i\cdot r$, which the remaining coordinate could not cancel
+because $r_j+r_k>r_\ell$.  Consequently all pair products on
+$j,k$ are negative and their absolute sum is exactly $r_jr_k$ by
+orthogonality.  Since $b_i^2<b_i(1-b_i)$, it follows that
+$E_{jk}\le r_jr_k$ and $D_{jk}\ge2r_jr_k$.
+Let $j,k,\ell$ be source, middle, and sink. Their energy
+balances imply
+\[
+ \delta\le r_\ell^2+r_jr_\ell+r_kr_\ell\le r_\ell,
+\]
+and
+\[
+ \delta\le r_k^2+r_jr_k-2r_kr_\ell
+ \le r_k(1-3r_\ell)
+ \le\frac{1-3\delta}{2}.
+\]
+The intermediate bound $\delta\le r_k(1-3r_\ell)$ and
+$\delta>0$, $r_k>0$ imply $1-3r_\ell>0$.
+Thus $r_k\le1/2$ and $r_\ell\ge\delta$ justify
+the last inequality. This contradicts $\delta>1/5$.
+\end{proof}
+
+\begin{lemma}[Excluding degenerate-triangle zero-weight full rows]
+\label{lem:r2-degenerate-triangle}
+For $m\ge1$, a maximizing frame with $3m+2$ rows admits no normalized
+multiplier system with a zero-weight full-support row $r$ whose
+coordinate magnitudes satisfy a degenerate triangle equality.
+\end{lemma}
+\begin{proof}
+Change column signs so that $r_j>0$ for all $j$.
+Suppose instead that one triangle inequality is an equality.
+By \cref{lem:r2-full-kernel-structure}, the orientation and
+large-entry counts are as stated there. Relabel so that
+$r_1=r_2+r_3\le1/2$. Products on pairs $12$ and $13$ are
+negative. If $P$ is the sum of the positive products on pair
+$23$, the negative products there have total $P+r_2r_3$.
+The exact loss is
+\begin{equation}
+ L=1+4r_2r_3+4P,
+ \qquad r_2r_3+P<\frac1{10}.
+ \label{eq:r2-degenerate-kernel-loss}
+\end{equation}
+For pair $12$, each smaller coordinate $b_i<1/2$ satisfies
+\[
+ b_i(1-b_i)\le r_1r_2\le r_2(1-r_2),
+\]
+so $b_i\le r_2$ and
+\[
+ E_{12}\le\frac{r_2}{1-r_2}r_1r_2\le r_2^2.
+\]
+Similarly $E_{13}\le r_3^2$. These bounds are independent of
+the orientation of the respective pairs.
+On pair $23$, \eqref{eq:r2-degenerate-kernel-loss} gives
+$b_i(1-b_i)<1/10<7/64$, hence $b_i<1/8$. Therefore
+\begin{equation}
+ E_{23}<\frac17(r_2r_3+2P)<\frac1{35}.
+ \label{eq:r2-small-cross-edge}
+\end{equation}
+Since the directed triangle has exactly one sink, it remains to
+consider the three possible locations of that sink.
+
+\emph{Sink $1$.}  The middle coordinate is $j=2$ or $3$.
+Its incoming pair energy comes only from the other coordinate among
+$2,3$ and is at most $E_{23}<1/35$.  The energy balance for the
+middle coordinate gives
+\[
+ \delta=r_j^2+E_{23}-D_{j1}
+ \le r_j^2+E_{23}-2r_jr_1<E_{23}<\frac1{35},
+\]
+where $r_j\le r_1$ was used.
+
+\emph{Sink $2$.}  Its incoming pair energy is at most
+$E_{12}+E_{23}$, hence
+\[
+ \delta\le r_2^2+E_{12}+E_{23}
+ \le2r_2^2+\frac1{35}.
+\]
+Because $\delta>1/5$, this forces $r_2>1/4$, and therefore
+$r_3=r_1-r_2<1/4$.
+If coordinate $1$ is the source, then $3$ is the middle coordinate.
+Its energy increment satisfies
+$\delta\le r_3^2+E_{13}\le2r_3^2<1/8$.
+If coordinate $3$ is the source, then $1$ is the middle coordinate,
+with
+\[
+ \delta\le r_1^2+E_{13}-D_{12}
+ \le r_1^2+r_3^2-2r_1r_2
+ =2r_3^2-r_2^2\le r_3^2<\frac1{16}.
+\]
+
+\emph{Sink $3$.}  Interchanging coordinates $2$ and $3$ in the
+preceding argument gives the same contradiction.
+Each possible sink leads to a contradiction with $\delta>1/5$.
+\end{proof}
+
+\begin{lemma}[Positive row weights in residue two]
+\label{lem:r2-all-active}
+Let $m\ge1$ and let $A$ be any maximizing feasible frame in
+dimension $3m+2$. Every normalized multiplier system for $A$
+has $\lambda_i>0$ for
+all $i$. Consequently all row constraints are saturated.
+\end{lemma}
+\begin{proof}
+Fix an arbitrary normalized multiplier system and suppose that
+$\lambda_{i_0}=0$. By \cref{lem:r2-kernel-reduction}, the
+nonzero row $r=a_{i_0}$ has no strictly dominant coordinate, so its
+support has size two or three. Support of size two contradicts
+\cref{lem:r2-zero-weight-pair}. In the full-support case, the
+non-strict triangle inequalities follow from kernel reduction.
+If all three triangle inequalities are strict, this contradicts
+\cref{lem:r2-strict-triangle}. If one is an equality, it contradicts
+\cref{lem:r2-degenerate-triangle}. We have ruled out every possible support for a zero-weight row.
+Thus every weight is positive, and complementarity in
+\cref{lem:multipliers} gives
+$\|a_i\|_1=1$ for every row.
+\end{proof}
+
+\subsection{Excluding full-support rows}
+Now that \cref{lem:r2-all-active} supplies positive row weights,
+the common normal forms in \cref{lem:full-row-classification}
+can be used to exclude full-support rows in this residue class.
+
+\begin{proposition}[Exclusion of full rows in the second residue class]
+\label{prop:r2-full-exclusion}
+Let $A$ be a maximizing feasible matrix in dimension $3m+2$,
+with $A^{\mathsf T}A=(m+\delta)I_3$ and
+$1/5<\delta\le4/9$.  Suppose every normalized multiplier system for
+$A$ has strictly positive row weights.  Then $A$ has no full row.
+\end{proposition}
+\begin{proof}
+In the one-full-row form, the third mixed column has squared mass
+$c^2+y^2+z^2<1$, as in the proof of
+\cref{prop:r1-one-full}, so $p_3=m$. In the second column,
+$b^2+x^2+(1-z)^2<2$, giving $p_2\in\{m-1,m\}$.
+The first column contains the two pair-row entries $1-x$ and $1-y$.
+Since $x,y<1/2$ and $\delta\le4/9$, their squared sum satisfies
+\[
+ (1-x)^2+(1-y)^2>\frac12>\delta.
+\]
+Thus $p_1\le m-1$, since $p_1=m$ would leave only $\delta$
+units of squared mass for all non-pure rows in that column.
+The total pure count $p_1+p_2+p_3=3m-2$ now leaves exactly
+$(p_1,p_2)=(m-2,m)$ or $(m-1,m-1)$.
+For the first possibility,
+$\delta=3a^2-2a-x^2-y^2>1/5$ implies $a>3/4$.
+Then $c<1/4$ and
+$\delta=c^2+y^2+z^2<3c^2<3/16$, a contradiction.
+For the second possibility,
+\[
+ \delta=1+3a^2-2a-x^2-y^2,
+ \quad \delta=b^2+x^2-2bc-z^2,
+ \quad \delta=c^2+y^2+z^2.
+\]
+The last two equations give $c>1/4$ and $b>9/20$, using
+$\delta<3c^2$ and $\delta<2b(b-c)$.
+Thus $a<3/10$.  Since $x,y<a$, the first equation yields
+$\delta>(1-a)^2>49/100>4/9$, again a contradiction.
+
+In the two-full-row form, every mixed column has positive squared
+energy, so $p_j\le m$ for all $j$. Also, $p_2\in\{m-1,m\}$.
+The pure count is $p_1+p_2+p_3=3m-1$.
+If $p_2=m-1$, then $p_1=p_3=m$ and
+$R^{\mathsf T}R=\delta I_2$.  This gives
+$g^2+h^2=\delta<1/2$, contrary to $g+h=1$.
+If $p_2=m$, then $(p_1,p_3)=(m-1,m)$ up to interchange.
+With $y=\sqrt\delta$, $x=\sqrt{1+y^2}$, the row equations give
+\[
+ C=x(\sqrt2-y)-y,\qquad S=x-y(\sqrt2-y),\qquad C^2+S^2=1.
+\]
+Here $\sqrt{1/5}<y\le2/3$.  The function $C$ is strictly decreasing,
+since
+\[
+ C'=\frac{\sqrt2\,y-2y^2-1}{\sqrt{1+y^2}}-1<0.
+\]
+At the left endpoint, the bounds
+$\sqrt{6/5}<11/10$, $\sqrt2<10/7$, and $\sqrt{1/5}>4/9$
+give $C<67/105<16/25$.
+The function $S$ is strictly convex because
+$S''=2+(1+y^2)^{-3/2}>0$.
+At the left endpoint $S<7/10$, while at $y=2/3$,
+using $\sqrt{13}<181/50$ and $\sqrt2>7/5$, one gets
+$S<323/450<18/25$.
+Both $C,S$ are positive for the putative frame.  Hence
+\[
+ C^2+S^2<\left(\frac{16}{25}\right)^2+
+                 \left(\frac{18}{25}\right)^2
+          =\frac{116}{125}<1,
+\]
+the final contradiction.
+\end{proof}
+
+\subsection{The upper bound when no row has full support}
+
+\begin{proposition}\label{prop:r2-no-full}
+If a maximizing frame in dimension $3m+2$ has no full-support
+row, then $\delta\le\Delta$.
+\end{proposition}
+
+\begin{proof}
+By \cref{lem:r2-all-active}, all row weights are positive and all
+rows are saturated.  Suppose, for a contradiction, that some pair row is balanced,
+with nonzero magnitudes $(1/2,1/2)$.  By \eqref{eq:pair-stationarity}, the two corresponding
+diagonal entries of $S$ are equal.  Its positive stationarity factors
+then force every pair row on these columns to be balanced.
+Column orthogonality requires at least two such rows with opposite
+product signs.  Each has loss $1/2$, so their total loss is at least
+$1$.
+
+Neither of these balanced rows has an entry larger than $1/2$.
+Of the $3m+2$ rows, at most $3m$ can therefore carry a large entry.
+By \cref{prop:r2-column-bounds}, each column must have exactly $m$
+large entries.  The third column, outside the balanced pair,
+requires at least $\delta$ of squared energy from small entries
+in other rows.  Their total loss is at least $2\delta$ by the
+small-entry inequality in \cref{prop:r2-column-bounds}.
+Thus
+\[
+ L=2-3\delta\ge1+2\delta,
+\]
+contrary to $\delta>1/5$.
+
+Thus every row has a unique coordinate larger than $1/2$.
+The oriented pair graph is acyclic by
+\eqref{eq:r2-pair-stationarity}.  Since every column has at least
+$m$ large entries and there are $3m+2$ rows, the counts are either
+$(m+2,m,m)$ or $(m+1,m+1,m)$, up to permutation.
+For a column with $p_j$ large entries, each pure row contributes
+squared mass $1$. A pair row directed away from this column
+reduces that contribution by $2b_i-b_i^2$, while an incoming
+pair row contributes $b_i^2$. Therefore the column-energy balance is
+\begin{equation}
+ m+\delta=p_j-D_j^{\mathrm{out}}+E_j^{\mathrm{in}}.
+ \label{eq:r2-vertex-balance}
+\end{equation}
+
+Suppose first that the counts are $(m+2,m,m)$.
+Each of the two columns with count $m$ has incoming energy
+at least $\delta$. For each group of edges entering one of those columns, let $E$
+and $L$ denote its incoming energy and total row loss.  By \cref{lem:edge-transfer},
+\[
+ L\ge
+ \begin{cases}
+  2\sqrt{2E}-2E\ge2\sqrt{2\delta}-2\delta,&
+      \delta\le E\le1/2,\\
+  2E\ge1\ge2\sqrt{2\delta}-2\delta,&E\ge1/2.
+ \end{cases}
+\]
+The groups entering the two columns with exactly $m$ large entries
+are disjoint. Hence
+\[
+ 2-3\delta\ge4\sqrt{2\delta}-4\delta.
+\]
+Since $\delta\le4/9$, this yields
+$\delta\le14-8\sqrt3<1/5$, a contradiction.
+
+The counts must therefore be $(m+1,m+1,m)$.
+Choose a topological ordering $1,2,3$ of the pair graph.
+The source cannot have only $m$ large entries. Indeed, it has
+no incoming energy, while its outgoing deficit is nonnegative,
+so \eqref{eq:r2-vertex-balance} would give $m+\delta\le m$. Put $D_0=1-\delta$.
+At the source,
+\[
+ D_{12}+D_{13}=D_0,\qquad
+ E_{12}+E_{13}\le B(D_0).
+\]
+Because $\delta\ge\Delta$ and $B$ is increasing,
+\begin{equation}
+ B(D_0)\le B(1-\Delta)=\frac\Delta2\le\frac\delta2.
+ \label{eq:r2-source-cap}
+\end{equation}
+The equality follows by substituting
+$\Delta=(\sqrt6-2)^2$ into
+$B(D)=2(1-\sqrt{1-D/2})^2$.  Thus all outgoing edges of
+the source together carry at most $\delta/2$ of incoming energy.
+If the middle vertex had count $m$, then
+$\delta=E_{12}-D_{23}\le E_{12}\le\delta/2$.
+Thus the middle vertex has count $m+1$ and the sink has
+count $m$.
+
+The middle and sink balances now give
+\[
+ D_{23}=D_0+E_{12}<1,
+ \qquad \delta=E_{13}+E_{23}.
+\]
+To verify the first strict inequality,
+\eqref{eq:r2-source-cap} gives
+$E_{12}\le B(D_0)\le\delta/2$, and therefore
+$D_{23}\le1-\delta/2<1$ because $\delta>0$.
+Using the transfer bound, we have
+\[
+ \delta=E_{13}+E_{23}
+ \le B(D_0)-E_{12}+B(D_0+E_{12}).
+\]
+Since $B'(D)<1$ on $0\le D<3/2$ and
+$D_0+E_{12}=D_{23}<1$, the mean value theorem implies
+$B(D_0+E_{12})-B(D_0)\le E_{12}$.  Consequently
+\[
+ \delta\le2B(D_0)
+ =4\left(1-\sqrt{\frac{1+\delta}{2}}\right)^2.
+\]
+Both sides of
+$\sqrt\delta/2\le1-\sqrt{(1+\delta)/2}$ are nonnegative.
+Squaring and rearranging yields
+$\delta+4\sqrt\delta-2\le0$, hence
+$\sqrt\delta\le\sqrt6-2$ and $\delta\le\Delta$.
+\end{proof}
+
+\begin{theorem}\label{thm:r2-sharp}
+For every integer $m\ge1$,
+\[
+ \F(3m+2)=m+10-4\sqrt6.
+\]
+\end{theorem}
+
+\begin{proof}
+The construction \eqref{eq:r2-construction} gives the lower
+bound. For a maximizing frame, Lemma~\ref{lem:r2-all-active}
+gives positive row weights. If a full-support row is present,
+Lemma~\ref{lem:full-pd} and Proposition~\ref{prop:support-bound}
+give $Q+2F\le5$. Lemma~\ref{lem:full-row-classification} and
+Proposition~\ref{prop:r2-full-exclusion} then rule out that case.
+With no full-support row, Proposition~\ref{prop:r2-no-full}
+gives the matching upper bound.
+\end{proof}
+
+\begin{proof}[Completion of the proof of \cref{thm:sharp-values}]
+The divisible case is \cref{prop:matrix-model}. The first-residue
+analysis proves the two exceptional values and the stable star value.
+The second-residue analysis proves the value supplied by the five-row
+core. These exhaust the integers $n\ge3$. The recurrence was deduced
+from precisely these branches in \cref{cor:eventual-recurrence}.
+\end{proof}
+
+% END sections/r2
+% BEGIN sections/consequences
+\Needspace{18\baselineskip}
+\section{Consequences}
+\label{sec:consequences}
+\subsection{Centered regular tetrahedra}
+Let $T(n)$ be the greatest common distance between the four vertices
+of a regular tetrahedron contained in $C_n$, subject to the additional
+condition that their centroid, the average of the four vertices,
+is the origin.
+
+This centering condition distinguishes our result from two related
+problems. Hudelson, Klee, and Larman \cite{HudelsonKleeLarman1996}
+maximize the volume of simplices in cubes without imposing regularity.
+Firsching \cite{Firsching2017} discusses regular tetrahedra in cubes
+without fixing the centroid, including constructions in dimensions
+$4$ and $7$. Neither result supplies the centered optimum below.
+We prove
+\begin{equation}\label{eq:tetrahedron}
+ T(n)=\sqrt2\,f(3,n).
+\end{equation}
+To see this, use the sign matrix
+\[
+ H=\begin{pmatrix}
+ 1&1&-1&-1\\
+ 1&-1&1&-1\\
+ 1&-1&-1&1
+ \end{pmatrix}.
+\]
+It satisfies $HH^{\mathsf T}=4I_3$ and
+$H^{\mathsf T}H=4I_4-J_4$. For a three-vector $a$,
+$\norm{a^{\mathsf T}H}_\infty=\norm a_1$: the four columns of $H$
+and their negatives are the eight sign vectors.
+For a feasible matrix $A$ at level $s$, the four columns of $AH/2$
+are centered, lie in $C_n$, and have pairwise distance $\sqrt{2s}$.
+Conversely every centered regular tetrahedron of edge length $\ell$
+has a vertex matrix $V$ with
+$V^{\mathsf T}V=(\ell^2/2)(I_4-J_4/4)$. The matrix
+$A=VH^{\mathsf T}/2$ then satisfies $AH/2=V$,
+$A^{\mathsf T}A=(\ell^2/2)I_3$, and the required row bounds.
+This proves \eqref{eq:tetrahedron}. In particular,
+\[
+ \F(5)=11-4\sqrt6,\qquad T(5)=4-\sqrt6.
+\]
+The equality concerns only tetrahedra with centroid at the
+origin. It does not assert the same optimum without that
+restriction.
+
+\Needspace{12\baselineskip}
+\subsection{General inner dimension}
+For a fixed inner dimension $k\ge2$ and residue $0\le r<k$,
+put
+\[
+ g_r(m)=F_k(km+r)-m\qquad(m\ge1).
+\]
+Subtracting $m$ removes the linear increase associated with
+repeated stacking of identity blocks. The resulting \emph{residue
+correction} stabilizes if there exists an integer $M_r$ such that
+$g_r(m)=g_r(M_r)$ for every $m\ge M_r$.
+Stacking and the trace bound give
+\[
+ g_r(m+1)\ge g_r(m),\qquad 0\le g_r(m)\le r/k
+\]
+whenever $m\ge1$. Thus $g_r(m)$ has a limit.  A bounded nondecreasing sequence need
+not be eventually constant, so an additional structural condition is
+required.
+
+A \emph{unit coordinate row} is a signed standard basis vector
+$\pm e_j$.  Such a row contributes one unit to the $j$th diagonal
+entry of $A^{\mathsf T}A$.  Rows such as $(t,0,\ldots,0)$ with
+$0<|t|<1$ are not removable unit coordinate rows, even though
+their support has size one.  We call the remaining non-unit rows
+the \emph{residual core}.
+
+\Needspace{14\baselineskip}
+\begin{proposition}[Finite cores and stabilization]\label{prop:finite-core}
+Fix $k\ge2$. The following two properties are equivalent:
+\begin{enumerate}
+\item There is an integer $C$ such that, for every sufficiently large
+ambient dimension $n$, some maximizing feasible matrix has at most $C$
+rows that are not signed coordinate vectors.
+\item For every residue $r$ modulo $k$, the sequence $g_r(m)$ is eventually
+constant.
+\end{enumerate}
+\end{proposition}
+\begin{proof}
+Only signed unit coordinate rows are removed in this argument.
+Suppose (1), and choose nonnegative integers $C,N$ such that the stated
+core bound holds in every dimension $n\ge N$. Set
+$M=\max\{1,C,N\}$. Fix $0\le r<k$ and $m\ge M$, and choose a maximizing
+frame in dimension $km+r$ with at most $C$ residual rows. Its level is
+$m+c$, where $c=g_r(m)$ and $0\le c\le r/k<1$.
+
+Let $q_j$ be the number of unit coordinate rows in coordinate $j$, and let $t\le C$
+be the number of residual rows. The energy in column $j$ gives
+$q_j\le m+c<m+1$, hence $q_j\le m$. Counting all rows now yields
+\[
+ q_j=km+r-t-\sum_{\ell\ne j}q_\ell
+ \ge m+r-t\ge m-C\ge m-M.
+\]
+Remove $m-M$ unit coordinate rows in each coordinate. These choices are disjoint,
+and their total contribution to the Gram matrix is $(m-M)I_k$.
+The remaining matrix has $kM+r$ rows, satisfies the same row bounds,
+and has Gram matrix $(M+c)I_k$. Therefore
+\[
+ M+c\le F_k(kM+r),\qquad g_r(m)\le g_r(M).
+\]
+Stacking gives the reverse inequality, so $g_r(m)=g_r(M)$ for every
+$m\ge M$. This proves (2).
+
+Conversely, choose one maximizing frame at the start of the constant
+tail in each residue class. Stack identity blocks to obtain maximizing
+frames in every later dimension. The number of noncoordinate rows
+never increases, so the finitely many chosen cores provide a uniform $C$.
+\end{proof}
+
+\begin{remark}
+Removing one copy of $I_k$ reduces the number of rows by $k$
+and the level by $1$.  The bound on residual rows ensures that
+sufficiently many such blocks can be removed.
+\end{remark}
+
+The sharp formula in \cref{thm:sharp-values} is specific to
+$k=3$. For general $k\ge2$, \cref{prop:finite-core} is an equivalence, not
+an existence theorem for uniformly bounded residual cores.
+In the case $k=3$, the constructions yield a concrete uniform
+bound of four non-unit coordinate rows in some maximizer in every
+dimension $n\ge3$.  In dimensions $3m$, the identity construction
+has no such rows.  The four-row construction has at most four, the
+seven-row construction has three, and the five- and ten-row cores
+each have four. Stacking identity blocks preserves these counts.
+This existence statement is also recorded as a separate
+Lean theorem.  We do not assert that four is the smallest uniform
+bound or classify all maximizing frames up to symmetry.
+
+% END sections/consequences
+\appendix
+\section{Rational endpoint checks}\label{app:root-arithmetic}
+We record the rational endpoint comparisons used in
+\cref{lem:root-isolation}. The estimates use
+$141421356/10^8<\sqrt2<141421357/10^8$.
+The endpoint estimates, checked by squaring rational bounds, are
+\par\smallskip
+{\centering\small
+\begin{tabular}{@{}c c c c@{}}
+\toprule
+test & bound on $C_j$ & bound on $S_j$ & conclusion\\
+\midrule
+$j=1$, $y=17/100$ & $C_1<236/1000$ & $S_1<947/1000$ & $C_1^2+S_1^2<1$\\
+$j=2$, $y=347/2000$ & $C_2>7971/10000$ & $S_2>6047/10000$ & $C_2^2+S_2^2>1$\\
+$j=2$, $y=7/40$ & $C_2<796/1000$ & $S_2<605/1000$ & $C_2^2+S_2^2<1$\\
+\bottomrule
+\end{tabular}\par}
+\smallskip
+For the first test, $10143/10000<x_1<10144/10000$.
+For the second, $142481/100000<x_2<142482/100000$.
+At the last endpoint $x_2=57/40$ exactly.
+
+
+\clearpage
+\section*{Formalization and AI disclosure}
+The accompanying Lean~4 project formalizes the matrix formulation
+and the main results. It provides version-pinned dependencies and
+reproducible build and audit instructions. The available local build
+and kernel-axiom audit records concern the formal statements and
+proofs, and do not by themselves verify every sentence of the
+mathematical exposition.
+
+OpenAI ChatGPT, including GPT-6 and Pro-mode assistance, was used
+during 2026 to explore possible arguments, assist with literature
+searches, draft and revise parts of the manuscript, and write and
+debug parts of the Lean~4 code. Use of these tools does not by
+itself establish mathematical correctness. A full author-side
+mathematical review of the exposition and formal specifications has
+not yet been completed, and the draft has not undergone peer review.
+
+\medskip
+\begin{thebibliography}{99}
+\bibitem{Gardner1966}
+M. Gardner,
+Is it possible to visualize a four-dimensional figure?,
+\emph{Scientific American} \textbf{215} (1966), no.~5, 138--143
+(\emph{Mathematical Games}).
+
+\bibitem{CFG1991}
+H. T. Croft, K. J. Falconer, and R. K. Guy,
+\emph{Unsolved Problems in Geometry},
+Springer, New York, 1991, Problem~B4, p.~53.
+\url{https://doi.org/10.1007/978-1-4612-0963-8}.
+
+\bibitem{Shultz2013}
+K. R. P. D. Shultz,
+\emph{Largest $m$-cube in an $n$-cube: Partial solution},
+KITP preprint NSF-ITP-13-142 (2013).
+Notes written in 1996 and assembled in 2013 with a preface by G. Huber.
+The work is cited in~\cite{HSW2018}.
+\url{https://www.kitp.ucsb.edu/sites/default/files/preprints/2013/13-142.pdf}.
+
+\bibitem{Finch2003}
+S. R. Finch,
+\emph{Mathematical Constants},
+Cambridge University Press, Cambridge, 2003, Sec.~8.14, pp.~524--525.
+
+\bibitem{Firsching2014}
+M. Firsching,
+Answer to ``Problem equivalent to `largest square in a cube',''
+\emph{MathOverflow}, 19 October 2014 (updated 23 October 2014).
+\url{https://mathoverflow.net/questions/15498/problem-equivalent-to-largest-square-in-a-cube}.
+
+\bibitem{HudelsonKleeLarman1996}
+M. Hudelson, V. Klee, and D. G. Larman,
+Largest $j$-simplices in $d$-cubes: Some relatives of the Hadamard
+maximum determinant problem,
+\emph{Linear Algebra Appl.} \textbf{241--243} (1996), 519--598.
+\url{https://doi.org/10.1016/0024-3795(95)00541-2}.
+
+\bibitem{Firsching2017}
+M. Firsching,
+Answer to ``Largest regular $k$-simplex inscribed in a $d$-cube,
+$k<d$'',
+\emph{MathOverflow}, 9 August 2017 (subsequently edited).
+\url{https://mathoverflow.net/a/278340}.
+
+\bibitem{HSW2018}
+G. Huber, K. Pechenick Shultz, and J. E. Wetzel,
+The $n$-cube is Rupert,
+\emph{American Mathematical Monthly} \textbf{125} (2018), no.~6, 505--512.
+\url{https://doi.org/10.1080/00029890.2018.1448197}.
+
+\bibitem{SteiningerYurkevich2023}
+J. Steininger and S. Yurkevich,
+An algorithmic approach to Rupert's problem,
+\emph{Mathematics of Computation} \textbf{92} (2023), 1905--1929.
+\url{https://doi.org/10.1090/mcom/3831}.
+
+\end{thebibliography}
+\end{document}

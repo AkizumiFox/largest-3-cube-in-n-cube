@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: >-
+  If you use the Lean formalization or manuscript, cite this preliminary
+  research project and identify the version or commit you consulted.
+type: software
+title: "Largest three-dimensional cubes in higher-dimensional unit cubes (Lean 4 formalization)"
+authors:
+  - given-names: "K.-C."
+    family-names: "Chang"
+abstract: >-
+  Preliminary working draft and Lean 4 formalization of the exact
+  largest three-dimensional cube in a unit n-cube.
+keywords:
+  - Lean 4
+  - formalized mathematics
+  - computational geometry
+  - cube embeddings
+license: Apache-2.0

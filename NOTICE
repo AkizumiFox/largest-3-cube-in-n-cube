@@ -1,0 +1,14 @@
+F3: Largest three-dimensional cubes in higher-dimensional unit cubes
+Copyright 2026 K.-C. Chang
+
+The original Lean 4 code, build/test scripts and repository documentation
+(outside paper/) in this repository are licensed under the Apache License,
+Version 2.0, included in the root LICENSE.
+
+The mathematical manuscript, its LaTeX source and accompanying figures in
+paper/ are not licensed under Apache-2.0. Those materials are subject to
+All rights reserved, as specified in paper/LICENSE.
+
+Third-party dependencies such as Lean 4 and Mathlib remain subject to their
+respective copyright notices and licenses. They are referenced through
+the package manifest and are not redistributed in this repository.
