@@ -65,8 +65,9 @@
 \maketitle
 \begin{abstract}
 We determine the maximal side length $f(3,n)$ of a three-dimensional
-cube contained in the unit $n$-cube for every $n\ge3$. The values in
-dimensions $4$ and $5$, and those for $3\mid n$, were previously known.
+cube contained in the unit $n$-cube for every $n\ge3$. The values
+for $3\mid n$ and in dimension $4$ were previously known, and the value
+in dimension $5$ had been reported without a published proof.
 We obtain exact values in the remaining cases, including the exceptional
 dimension $n=7$, and prove the recurrence
 $f(3,n+3)^2=f(3,n)^2+1$ for every $n\ge8$.
@@ -98,11 +99,19 @@ We write $F_k(n)=f(k,n)^2$ and set
 \[
  \ds=15-4\sqrt{14},\qquad \Dlt=10-4\sqrt6.
 \]
-The two exceptional algebraic constants $\delta_1$ and $\delta_2$
-are specified uniquely in \cref{sec:algebraic-parameters}.  Their
-approximate values are $\delta_1\approx0.014925$ and
-$\delta_2\approx0.030276$.  The explicit defining equations are
-introduced together with the exceptional constructions they describe.
+The two exceptional algebraic constants are
+$\delta_1\approx0.014925$, the smaller positive root of
+\[
+ p_1(d)=4d^4-12d^3-67d^2-66d+1,
+\]
+and $\delta_2\approx0.030276$, the smallest positive root of the
+irreducible polynomial
+\[
+ p_2(d)=d^8-8d^7-12d^6+80d^5+70d^4-200d^3-28d^2-32d+1.
+\]
+Their defining equations, which come from the exceptional
+constructions, are given in \cref{sec:algebraic-parameters}, where
+the polynomials $p_1,p_2$ are also derived.
 
 \begin{theorem}[Exact formula]\label{thm:sharp-values}
 For every integer $n\ge3$,
@@ -166,8 +175,12 @@ five-dimensional value attributed to Huber:
 \[
  f(3,5)=\sqrt{11-4\sqrt6}=2\sqrt2-\sqrt3.
 \]
-An explicit construction appears in \cite{Firsching2014}.
-Thus $f(3,4)$ and $f(3,5)$ were known before this work.
+An explicit construction appears in \cite{Firsching2014}, where it is
+presented as a lower bound obtained with numerical optimization and
+explicitly not as a proof of optimality.
+Thus $f(3,4)$ was proved before this work, and the value of $f(3,5)$
+had been reported. We are not aware of a published proof of the
+matching upper bound for $f(3,5)$; \cref{sec:residue-two} supplies one.
 Huber and Ligocki's related study of scaling in generalized Rupert
 problems is listed as unpublished in \cite{HSW2018}.
 No result from that manuscript is used here.
@@ -411,7 +424,7 @@ the identity. The term describes a construction, not a uniquely
 determined part of an optimal matrix. The \emph{residual core} in
 \cref{prop:finite-core} has a different, precise meaning: it is the
 collection of rows that are not signed unit coordinate vectors.
-The following five-row matrix gives the known value $F_3(5)$
+The following five-row matrix attains the previously reported value $F_3(5)$
 \cite{Finch2003}.  Another construction appears in \cite{Firsching2014}.
 We use this matrix because it can be stacked with copies of $I_3$:
 
@@ -519,7 +532,9 @@ would decrease every active form and, by continuity and finiteness, all
 other forms would remain below $1$.  This would contradict the
 minimality of $A$.
 
-We use the following finite-dimensional alternative.  For linear
+We use the following finite-dimensional alternative, which is
+Gordan's theorem of the alternative (see, e.g.,
+\cite[Ch.~7]{Schrijver1986}).  For linear
 functionals $L_1,\ldots,L_N$ on a vector space $T$, either some
 $v\in T$ satisfies $L_a(v)<0$ for every $a$, or there are
 $\mu_a\ge0$ with $\sum_a\mu_a=1$ such that
@@ -763,7 +778,9 @@ of $h$ on $\mathcal M_s$.
 Put $W_0=-s^{-1}AH^{\mathsf T}H$. It satisfies
 $A^{\mathsf T}W_0+W_0^{\mathsf T}A=-2H^{\mathsf T}H$.
 There exists $K\in T_A\mathcal M_s$ for which every active facet is
-negative on $W_0+K$. Otherwise the strict affine alternative would give
+negative on $W_0+K$. Otherwise the inhomogeneous version of the
+alternative used in \cref{lem:multipliers}, a consequence of Motzkin's
+transposition theorem \cite[Ch.~7]{Schrijver1986}, would give
 a convex combination of active facets vanishing on the tangent space
 and nonnegative on $W_0$. Its multiplier matrix $S$ would satisfy
 \[
@@ -1147,7 +1164,17 @@ equation for $y_1$ gives the necessary relation
 The first factor is negative throughout $0<y<17/100$, the
 interval containing $y_1$. Hence the second factor vanishes
 at $y_1$. Substituting $x_0=1+y_1^2$
-then gives the displayed quartic.
+then gives the displayed quartic. Equivalently, $\delta_1$ is a root of
+$p_1(d)=4(1+d)^4-28(1+d)^3-7(1+d)^2+16(1+d)+16$; this quartic is
+irreducible over $\mathbb Q$, and its only other real root is
+approximately $6.156$.
+
+Similarly, eliminating $x_2$ and $\sqrt2$ from the defining equation
+for $y_2$ (two resultants) gives $p_2(y^2)=0$, with $p_2$ as in
+\cref{sec:main}. The polynomial $p_2$ is irreducible over $\mathbb Q$,
+and its real roots are approximately
+$0.0303$, $1.625$, $2.945$ and $8.190$; hence $\delta_2$ is its
+smallest positive root.
 
 
 \begin{proposition}[Exceptional frames]
@@ -1930,7 +1957,7 @@ contrary to $\delta>1/5$.
 
 Thus every row has a unique coordinate larger than $1/2$.
 The oriented pair graph is acyclic by
-\eqref{eq:r2-pair-stationarity}.  Since every column has at least
+\eqref{eq:pair-stationarity}.  Since every column has at least
 $m$ large entries and there are $3m+2$ rows, the counts are either
 $(m+2,m,m)$ or $(m+1,m+1,m)$, up to permutation.
 For a column with $p_j$ large entries, each pure row contributes
@@ -2080,7 +2107,17 @@ has a vertex matrix $V$ with
 $V^{\mathsf T}V=(\ell^2/2)(I_4-J_4/4)$. The matrix
 $A=VH^{\mathsf T}/2$ then satisfies $AH/2=V$,
 $A^{\mathsf T}A=(\ell^2/2)I_3$, and the required row bounds.
-This proves \eqref{eq:tetrahedron}. In particular,
+This proves \eqref{eq:tetrahedron}.
+
+A shorter geometric argument is also available. Since $C_n$ is
+convex and symmetric about the origin, a centered regular tetrahedron
+$V$ lies in $C_n$ if and only if $\operatorname{conv}(V\cup -V)$
+does, and $\operatorname{conv}(V\cup-V)$ is a centered three-cube
+of side $\ell/\sqrt2$. Conversely the vertices of a centered
+three-cube split into two such tetrahedra. Finally, centering costs
+nothing in $f(3,n)$: if a cube $Q$ lies in $C_n$, so does $-Q$, and
+the Minkowski average $\tfrac12(Q+(-Q))$ is a congruent centered cube.
+In particular,
 \[
  \F(5)=11-4\sqrt6,\qquad T(5)=4-\sqrt6.
 \]
@@ -2248,6 +2285,11 @@ M. Firsching,
 Answer to ``Problem equivalent to `largest square in a cube',''
 \emph{MathOverflow}, 19 October 2014 (updated 23 October 2014).
 \url{https://mathoverflow.net/questions/15498/problem-equivalent-to-largest-square-in-a-cube}.
+
+\bibitem{Schrijver1986}
+A. Schrijver,
+\emph{Theory of Linear and Integer Programming},
+Wiley, Chichester, 1986.
 
 \bibitem{HudelsonKleeLarman1996}
 M. Hudelson, V. Klee, and D. G. Larman,
