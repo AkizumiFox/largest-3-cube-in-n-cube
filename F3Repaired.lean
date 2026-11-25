@@ -2,9 +2,7 @@
 Consolidated companion to the repaired f(3,n) manuscript.
 Requires mathlib v4.19.0 and Lean 4.19.0.
 Generated from F3/Frames.lean, F3/Cores.lean, and F3/Recurrence.lean.
-Legacy standalone file: it is not part of the `F3` build target.
-This file alone does not prove the sharp global upper bounds; they are
-formalized in the `F3` library (see `F3/PaperTheorems.lean` and the README).
+The sharp global upper bounds are NOT asserted as formally proved here.
 -/
 
 import Mathlib.Data.Real.Sqrt
