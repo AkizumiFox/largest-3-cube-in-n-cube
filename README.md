@@ -21,13 +21,17 @@ The manuscript gives the following exact values for every integer `n >= 3`:
 | `n=3m+1`, `m>=3` | `m+15-4*sqrt(14)` |
 | `n=3m+2`, `m>=1` | `m+10-4*sqrt(6)` |
 
-The two exceptional constants are defined algebraically in the paper, with
-`delta_1 ~ 0.014925` and `delta_2 ~ 0.030276`.
+The two exceptional constants are algebraic, with
+`delta_1 ~ 0.014925` and `delta_2 ~ 0.030276`: `delta_1` is the smaller
+positive root of `4d^4-12d^3-67d^2-66d+1`, and `delta_2` is the smallest
+positive root of `d^8-8d^7-12d^6+80d^5+70d^4-200d^3-28d^2-32d+1`.
 The formula gives `F_3(n+3) = F_3(n) + 1` for all `n >= 8`.
 
-The cases with `3 | n` and the exact values for `n=4` and `n=5` were known
-previously; see the manuscript's bibliography. Research priority for the entire
-family is not independently established, particularly in relation to unpublished
+The cases with `3 | n` and the exact value for `n=4` were proved previously.
+The value for `n=5` had been reported (Finch, attributing it to Huber) and
+attained by an explicit construction (Firsching), but we are not aware of a
+published proof of the matching upper bound; see the manuscript's bibliography.
+Research priority for the entire family is not independently established, particularly in relation to unpublished
 work by Huber and Ligocki.
 
 ## Manuscript
