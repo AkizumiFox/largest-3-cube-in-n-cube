@@ -36,7 +36,7 @@ work by Huber and Ligocki.
 
 ## Manuscript
 
-- `paper/manuscript.pdf`: current 30-page working draft.
+- `paper/manuscript.pdf`: current working draft.
 - `paper/manuscript.tex`: LaTeX source; compile from `paper/` with `latexmk -pdf manuscript.tex`.
 - `paper/pair_support_graph.pdf`: figure used in the manuscript.
 
